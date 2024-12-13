@@ -7,13 +7,14 @@ import {
   FormLabel,
   FormMessage,
 } from '../ui/form';
-import { Input, InputProps } from '../ui/input';
+import { Input } from '../ui/input';
+import { ComponentProps } from 'react';
 
 interface TextFieldProps {
   name: string;
   label?: string;
   description?: string;
-  inputProps: InputProps;
+  inputProps: ComponentProps<typeof Input>;
 }
 
 const TextField = ({

@@ -12,6 +12,7 @@ import apiClient from './lib/api-client';
 import { queryClient } from './lib/query-client';
 import { getStoredAccessToken, storeAccessToken } from './lib/token';
 import { Icons } from './components/ui/icons';
+import { USER_PROFILE_QUERY_KEY } from './constants/query-keys';
 
 export interface AuthContext {
   isAuthenticated: boolean;
@@ -22,15 +23,13 @@ export interface AuthContext {
 
 const AuthContext = createContext<AuthContext | null>(null);
 
-export const USER_PROFILE_QUERY_KEY = ['me'];
-
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [accessToken, setStoredAccessToken] = useState<string | null>(
     getStoredAccessToken()
   );
 
   const { data: user = null, isFetched } = useQuery({
-    queryKey: USER_PROFILE_QUERY_KEY,
+    queryKey: [USER_PROFILE_QUERY_KEY],
     queryFn: () => apiClient.get<User>('/api/users/me').then((res) => res.data),
     enabled: !!accessToken,
     initialData: accessToken ? undefined : null,
@@ -40,7 +39,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     storeAccessToken(null);
     setStoredAccessToken(null);
     queryClient.removeQueries({
-      queryKey: USER_PROFILE_QUERY_KEY,
+      queryKey: [USER_PROFILE_QUERY_KEY],
     });
   }, []);
 

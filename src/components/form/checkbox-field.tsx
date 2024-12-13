@@ -14,7 +14,7 @@ interface CheckboxFieldProps {
   name: string;
   label?: string;
   description?: string;
-  inputProps: CheckboxProps;
+  inputProps?: CheckboxProps;
 }
 
 const CheckboxField = ({
@@ -24,8 +24,6 @@ const CheckboxField = ({
   description,
 }: CheckboxFieldProps) => {
   const form = useFormContext();
-  const { id } = inputProps;
-  const inputId = useMemo(() => id || window.crypto.randomUUID(), [id]);
 
   return (
     <FormField
@@ -42,7 +40,8 @@ const CheckboxField = ({
           </FormControl>
           <div className="space-y-1 leading-none">
             <FormLabel>{label}</FormLabel>
-            <FormDescription>{description}</FormDescription> <FormMessage />
+            <FormDescription>{description}</FormDescription>
+            <FormMessage />
           </div>
         </FormItem>
       )}

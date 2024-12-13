@@ -1,18 +1,6 @@
 import axios, { AxiosError } from 'axios';
 import { getStoredAccessToken } from './token';
 
-export interface PaginatedResponse<TData> {
-  data: TData[];
-  meta: {
-    hasNextPage: boolean;
-    hasPreviousPage: boolean;
-    itemCount: number;
-    page: number;
-    pageCount: number;
-    take: number;
-  };
-}
-
 const { VITE_API_ENDPOINT } = import.meta.env;
 
 const apiClient = axios.create({

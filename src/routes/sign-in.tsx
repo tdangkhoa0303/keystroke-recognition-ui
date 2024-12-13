@@ -97,7 +97,7 @@ function SignIn() {
     <Form {...form}>
       <form autoComplete="off" onSubmit={handleSubmit(onSubmit)}>
         <div className="w-screen h-screen flex items-center justify-center">
-          <Card className="min-w-[400px]">
+          <Card className="min-w-[440px]">
             <CardHeader className="space-y-1">
               <CardTitle className="text-2xl">Welcome back!</CardTitle>
               <CardDescription>Enter your email below to login</CardDescription>
@@ -115,7 +115,6 @@ function SignIn() {
                 name="password"
                 label="Password"
                 inputProps={{
-                  type: 'password',
                   placeholder: 'Enter your password...',
                 }}
               />
@@ -126,7 +125,7 @@ function SignIn() {
                   disabled: isPending,
                   placeholder:
                     'Type the above string to confirm your identity...',
-                  onKeystokeEventsChange: (events) => {
+                  onKeystokeEventsChange: (events: KeystrokeEvent[]) => {
                     keystrokeEventsRef.current = events;
                   },
                 }}

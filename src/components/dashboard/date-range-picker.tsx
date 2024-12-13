@@ -1,11 +1,8 @@
-'use client';
-
-import * as React from 'react';
 import { CalendarIcon } from '@radix-ui/react-icons';
-import { addDays, format } from 'date-fns';
+import { format, subDays } from 'date-fns';
+import * as React from 'react';
 import { DateRange } from 'react-day-picker';
 
-import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Calendar } from '@/components/ui/calendar';
 import {
@@ -13,13 +10,16 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '@/components/ui/popover';
+import { cn } from '@/lib/utils';
+
+const TODAY = new Date();
 
 export function CalendarDateRangePicker({
   className,
 }: React.HTMLAttributes<HTMLDivElement>) {
   const [date, setDate] = React.useState<DateRange | undefined>({
-    from: new Date(2023, 0, 20),
-    to: addDays(new Date(2023, 0, 20), 20),
+    from: subDays(TODAY, 14),
+    to: TODAY,
   });
 
   return (

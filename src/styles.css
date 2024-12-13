@@ -28,7 +28,15 @@
     --chart-3: 197 37% 24%;
     --chart-4: 43 74% 66%;
     --chart-5: 27 87% 67%;
-    --radius: 0.5rem
+    --radius: 0.5rem;
+    --sidebar-background: 0 0% 98%;
+    --sidebar-foreground: 240 5.3% 26.1%;
+    --sidebar-primary: 240 5.9% 10%;
+    --sidebar-primary-foreground: 0 0% 98%;
+    --sidebar-accent: 240 4.8% 95.9%;
+    --sidebar-accent-foreground: 240 5.9% 10%;
+    --sidebar-border: 220 13% 91%;
+    --sidebar-ring: 217.2 91.2% 59.8%;
   }
   .dark {
     --background: 240 10% 3.9%;
@@ -54,7 +62,15 @@
     --chart-2: 160 60% 45%;
     --chart-3: 30 80% 55%;
     --chart-4: 280 65% 60%;
-    --chart-5: 340 75% 55%
+    --chart-5: 340 75% 55%;
+    --sidebar-background: 240 5.9% 10%;
+    --sidebar-foreground: 240 4.8% 95.9%;
+    --sidebar-primary: 224.3 76.3% 48%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 240 3.7% 15.9%;
+    --sidebar-accent-foreground: 240 4.8% 95.9%;
+    --sidebar-border: 240 3.7% 15.9%;
+    --sidebar-ring: 217.2 91.2% 59.8%;
   }
 }
 @layer base {
@@ -63,5 +79,59 @@
   }
   body {
     @apply bg-background text-foreground;
+  }
+}
+
+.spinner {
+  position: relative;
+  width: 120px;
+  height: 90px;
+  margin: 0 auto;
+}
+.spinner:before {
+  content: '';
+  position: absolute;
+  bottom: 30px;
+  left: 50px;
+  height: 30px;
+  width: 30px;
+  border-radius: 50%;
+  background: #ff3d00;
+  animation: loading-bounce 0.5s ease-in-out infinite alternate;
+}
+.spinner:after {
+  content: '';
+  position: absolute;
+  right: 0;
+  top: 0;
+  height: 7px;
+  width: 45px;
+  border-radius: 4px;
+  box-shadow: 0 5px 0 #fff, -35px 50px 0 #fff, -70px 95px 0 #fff;
+  animation: loading-step 1s ease-in-out infinite;
+}
+
+@keyframes loading-bounce {
+  0% {
+    transform: scale(1, 0.7);
+  }
+  40% {
+    transform: scale(0.8, 1.2);
+  }
+  60% {
+    transform: scale(1, 1);
+  }
+  100% {
+    bottom: 140px;
+  }
+}
+@keyframes loading-step {
+  0% {
+    box-shadow: 0 10px 0 rgba(0, 0, 0, 0), 0 10px 0 #fff, -35px 50px 0 #fff,
+      -70px 90px 0 #fff;
+  }
+  100% {
+    box-shadow: 0 10px 0 #fff, -35px 50px 0 #fff, -70px 90px 0 #fff,
+      -70px 90px 0 rgba(0, 0, 0, 0);
   }
 }

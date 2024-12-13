@@ -17,6 +17,8 @@ import { useCallback, useRef } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 
+import Logo from '@/components/logo';
+
 export const Route = createFileRoute('/sign-up')({
   component: SignUp,
 });
@@ -33,6 +35,8 @@ const SIGN_UP_FORM_FIELDS = {
   TWO_FA_1: '2fa1',
   TWO_FA_2: '2fa2',
   TWO_FA_3: '2fa3',
+  TWO_FA_4: '2fa4',
+  TWO_FA_5: '2fa5',
   ENABLE_BEHAVIORAL_BIOMETRICS: 'enableBehavioralBiometrics',
 } as const;
 
@@ -43,9 +47,6 @@ const formSchema = z
     [SIGN_UP_FORM_FIELDS.EMAIL]: z.string().email(),
     [SIGN_UP_FORM_FIELDS.PASSWORD]: z.string(),
     [SIGN_UP_FORM_FIELDS.CONFIRM_PASSWORD]: z.string(),
-    [SIGN_UP_FORM_FIELDS.PHONE_NUMBER]: z.string(),
-    [SIGN_UP_FORM_FIELDS.SECURITY_QUESTION]: z.string(),
-    [SIGN_UP_FORM_FIELDS.SECURITY_QUESTION_ANSWER]: z.string(),
     [SIGN_UP_FORM_FIELDS.ENABLE_BEHAVIORAL_BIOMETRICS]: z.boolean(),
   })
   .superRefine((schema, ctx) => {
@@ -64,7 +65,7 @@ const formSchema = z
 function SignUp() {
   return (
     <>
-      <div className="md:hidden h-screen">
+      <div className="md:hidden h-screen max-h-screen">
         <img
           src="/examples/authentication-light.png"
           width={1280}
@@ -93,19 +94,8 @@ function SignUp() {
         <div className="relative hidden h-full flex-col bg-muted p-10 text-white dark:border-r lg:flex">
           <div className="absolute inset-0 bg-zinc-900" />
           <div className="relative z-20 flex items-center text-lg font-medium">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              className="mr-2 h-6 w-6"
-            >
-              <path d="M15 6v12a3 3 0 1 0 3-3H6a3 3 0 1 0 3 3V6a3 3 0 1 0-3 3h12a3 3 0 1 0-3-3" />
-            </svg>
-            Acme Inc
+            <Logo className="w-10 h-10 mr-2" />
+            KDR | Keystroke Dynamics Recognition
           </div>
           <div className="relative z-20 mt-auto">
             <blockquote className="space-y-2">
@@ -118,7 +108,7 @@ function SignUp() {
             </blockquote>
           </div>
         </div>
-        <div className="lg:p-8">
+        <div className="lg:p-8 max-h-screen overflow-auto">
           <div className="mx-auto flex w-full flex-col justify-center space-y-6 sm:w-[400px]">
             <div className="flex flex-col space-y-2 text-left">
               <h1 className="text-2xl font-semibold tracking-tight">
@@ -163,9 +153,6 @@ function SignUpForm() {
       lastName: '',
       email: '',
       password: '',
-      phoneNumber: '',
-      securityQuestion: '',
-      securityQuestionAnswer: '',
     },
   });
   const { handleSubmit, watch } = form;
@@ -191,6 +178,12 @@ function SignUpForm() {
           }),
           ...generateKeystrokeSamples({
             events: keystrokeEventsRef.current[SIGN_UP_FORM_FIELDS.TWO_FA_3],
+          }),
+          ...generateKeystrokeSamples({
+            events: keystrokeEventsRef.current[SIGN_UP_FORM_FIELDS.TWO_FA_4],
+          }),
+          ...generateKeystrokeSamples({
+            events: keystrokeEventsRef.current[SIGN_UP_FORM_FIELDS.TWO_FA_5],
           }),
         ],
         tp: tdnaInstance?.getTypingPattern({
@@ -250,7 +243,7 @@ function SignUpForm() {
                 disabled: isPending,
                 type: 'password',
                 placeholder: 'Enter your password...',
-                onKeystokeEventsChange: (events) => {
+                onKeystokeEventsChange: (events: KeystrokeEvent[]) => {
                   keystrokeEventsRef.current[SIGN_UP_FORM_FIELDS.PASSWORD] =
                     events;
                 },
@@ -263,7 +256,7 @@ function SignUpForm() {
                 disabled: isPending,
                 type: 'password',
                 placeholder: 'Confirm your password...',
-                onKeystokeEventsChange: (events) => {
+                onKeystokeEventsChange: (events: KeystrokeEvent[]) => {
                   keystrokeEventsRef.current[
                     SIGN_UP_FORM_FIELDS.CONFIRM_PASSWORD
                   ] = events;
@@ -280,13 +273,22 @@ function SignUpForm() {
             />
             {enableBehavioralBiometrics && (
               <>
+                <div className="flex flex-col space-y-2 text-left">
+                  <h1 className="text-xl font-semibold tracking-tight">
+                    Let us know your typing pattern
+                  </h1>
+                  <p className="text-sm text-muted-foreground">
+                    Type the text `When the dream come true, we go to bed`. This
+                    will be use for verify you on singning in!
+                  </p>
+                </div>
                 <TrackedTextField
                   name={SIGN_UP_FORM_FIELDS.TWO_FA_1}
-                  label=".tie5Roanl"
+                  label="When the dream come true, we go to bed"
                   inputProps={{
                     disabled: isPending,
                     placeholder: 'Let us know your typing styles...',
-                    onKeystokeEventsChange: (events) => {
+                    onKeystokeEventsChange: (events: KeystrokeEvent[]) => {
                       keystrokeEventsRef.current[SIGN_UP_FORM_FIELDS.TWO_FA_1] =
                         events;
                     },
@@ -294,11 +296,11 @@ function SignUpForm() {
                 />
                 <TrackedTextField
                   name={SIGN_UP_FORM_FIELDS.TWO_FA_2}
-                  label=".tie5Roanl"
+                  label="When the dream come true, we go to bed"
                   inputProps={{
                     disabled: isPending,
                     placeholder: 'Let us know your typing styles...',
-                    onKeystokeEventsChange: (events) => {
+                    onKeystokeEventsChange: (events: KeystrokeEvent[]) => {
                       keystrokeEventsRef.current[SIGN_UP_FORM_FIELDS.TWO_FA_2] =
                         events;
                     },
@@ -306,12 +308,36 @@ function SignUpForm() {
                 />
                 <TrackedTextField
                   name={SIGN_UP_FORM_FIELDS.TWO_FA_3}
-                  label=".tie5Roanl"
+                  label="When the dream come true, we go to bed"
                   inputProps={{
                     disabled: isPending,
                     placeholder: 'Let us know your typing styles...',
-                    onKeystokeEventsChange: (events) => {
+                    onKeystokeEventsChange: (events: KeystrokeEvent[]) => {
                       keystrokeEventsRef.current[SIGN_UP_FORM_FIELDS.TWO_FA_3] =
+                        events;
+                    },
+                  }}
+                />
+                <TrackedTextField
+                  name={SIGN_UP_FORM_FIELDS.TWO_FA_4}
+                  label="When the dream come true, we go to bed"
+                  inputProps={{
+                    disabled: isPending,
+                    placeholder: 'Let us know your typing styles...',
+                    onKeystokeEventsChange: (events: KeystrokeEvent[]) => {
+                      keystrokeEventsRef.current[SIGN_UP_FORM_FIELDS.TWO_FA_4] =
+                        events;
+                    },
+                  }}
+                />
+                <TrackedTextField
+                  name={SIGN_UP_FORM_FIELDS.TWO_FA_5}
+                  label="When the dream come true, we go to bed"
+                  inputProps={{
+                    disabled: isPending,
+                    placeholder: 'Let us know your typing styles...',
+                    onKeystokeEventsChange: (events: KeystrokeEvent[]) => {
+                      keystrokeEventsRef.current[SIGN_UP_FORM_FIELDS.TWO_FA_5] =
                         events;
                     },
                   }}

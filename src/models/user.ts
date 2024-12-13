@@ -1,10 +1,15 @@
+export enum SecurityLevel {
+  LOW = 'LOW',
+  MEDIUM = 'MEDIUM',
+  HIGH = 'HIGH',
+}
+
 export interface User {
-  _id: string;
+  id: string;
   firstName: string;
   lastName: string;
   email: string;
-  phoneNumber: string;
   createdAt: string;
-  updatedAt: string;
-  securityQuestion: string;
+  enableBehaviouralBiometrics: boolean;
+  securityLevel: SecurityLevel;
 }

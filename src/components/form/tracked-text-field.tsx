@@ -7,7 +7,7 @@ import {
   FormLabel,
   FormMessage,
 } from '../ui/form';
-import { Input, InputProps } from '../ui/input';
+import { Input } from '../ui/input';
 import {
   useCallback,
   useEffect,
@@ -15,9 +15,10 @@ import {
   KeyboardEvent as HTMLKeyboardEvent,
   RefObject,
   useImperativeHandle,
+  ComponentProps,
 } from 'react';
 import { KeystrokeTracker, SPECIAL_KEYS } from '@/lib/tracker';
-import { KeystrokeEvent, Sample } from '@/models/sample';
+import { KeystrokeEvent } from '@/models/sample';
 
 export interface TrackerControllers {
   reset: () => void;
@@ -27,7 +28,7 @@ interface TrackedTextFieldProps {
   name: string;
   label?: string;
   description?: string;
-  inputProps: InputProps & {
+  inputProps: ComponentProps<typeof Input> & {
     trackerRef?: RefObject<TrackerControllers>;
     onKeystokeEventsChange?: (events: KeystrokeEvent[]) => void;
   };
@@ -85,7 +86,7 @@ const TrackedTextField = ({
         });
       }
     },
-    []
+    [onKeyDown]
   );
 
   const handleKeyUp = useCallback(

@@ -1,176 +1,101 @@
 import { createFileRoute } from '@tanstack/react-router';
-
-import { Button } from '@/components/ui/button';
+import { faker } from '@faker-js/faker';
 import {
   Card,
   CardContent,
-  CardDescription,
+  CardFooter,
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { CalendarDateRangePicker } from '@/components/dashboard/date-range-picker';
-import { MainNav } from '@/components/dashboard/main-nav';
-import { Overview } from '@/components/dashboard/overview';
-import { RecentSales } from '@/components/dashboard/recent-sales';
-import { Search } from '@/components/dashboard/search';
-import TeamSwitcher from '@/components/dashboard/team-switcher';
-import { UserNav } from '@/components/dashboard/user-nav';
+import { Button } from '@/components/ui/button';
+import { useMemo, useState } from 'react';
+import { Skeleton } from '@/components/ui/skeleton';
 
 export const Route = createFileRoute('/__auth/')({
   component: () => <Index />,
 });
 
-function Index() {
+export type Product = {
+  id: string;
+  name: string;
+  description: string;
+  price: number;
+  category: string;
+  image: string;
+  stock: number;
+};
+
+function ProductCard({ product }: { product: Product }) {
+  const [isImageLoaded, setIsImageLoaded] = useState(false);
+
   return (
-    <>
-      <div className="flex items-center justify-between space-y-2">
-        <h2 className="text-3xl font-bold tracking-tight">Dashboard</h2>
-        <div className="flex items-center space-x-2">
-          <CalendarDateRangePicker />
-          <Button>Download</Button>
+    <Card className="max-w-sm shadow-md border-none">
+      <img
+        src={product.image}
+        alt={product.name}
+        onLoad={() => setIsImageLoaded(true)}
+        className="object-cover rounded-lg aspect-video"
+      />
+      {!isImageLoaded && <Skeleton className="rounded-lg aspect-video" />}
+      <CardHeader>
+        <CardTitle className="mt-2 text-lg font-bold">{product.name}</CardTitle>
+        <p className="text-sm text-muted-foreground">{product.category}</p>
+      </CardHeader>
+      <CardContent>
+        <p className="text-sm line-clamp-2">{product.description}</p>
+      </CardContent>
+      <CardFooter className="flex items-end justify-between border-t-2 border-t-slate-100">
+        <div>
+          <p className="text-xl font-semibold mt-2">
+            ${product.price.toFixed(2)}
+          </p>
+          {product.stock > 0 ? (
+            <p className="text-green-500 text-sm mt-1">
+              {product.stock} in stock
+            </p>
+          ) : (
+            <p className="text-red-500 text-sm mt-1">Out of stock</p>
+          )}
         </div>
+        <Button disabled={product.stock === 0}>Add to Cart</Button>
+      </CardFooter>
+    </Card>
+  );
+}
+
+const generateShopData = (count = 10): Product[] =>
+  Array.from({ length: count }).map(() => ({
+    id: faker.string.uuid(),
+    name: faker.commerce.productName(),
+    description: faker.commerce.productDescription(),
+    price: parseFloat(
+      faker.commerce.price({
+        min: 10,
+        max: 500,
+        dec: 2,
+      })
+    ), // Prices between $10 and $500
+    category: faker.commerce.department(),
+    image: faker.image.urlPicsumPhotos({
+      width: 1024,
+      height: 1024,
+      blur: 0,
+      grayscale: false,
+    }), // Random placeholder images
+    stock: faker.number.int({ min: 0, max: 100 }), // Random stock count
+  }));
+
+function Index() {
+  const products = useMemo(() => generateShopData(10), []);
+
+  return (
+    <div className="space-y-4">
+      <h2 className="text-3xl font-bold tracking-tight">Shop</h2>
+      <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-8">
+        {products.map((product) => (
+          <ProductCard key={product.id} product={product} />
+        ))}
       </div>
-      <Tabs defaultValue="overview" className="space-y-4">
-        <TabsList>
-          <TabsTrigger value="overview">Overview</TabsTrigger>
-          <TabsTrigger value="analytics" disabled>
-            Analytics
-          </TabsTrigger>
-          <TabsTrigger value="reports" disabled>
-            Reports
-          </TabsTrigger>
-          <TabsTrigger value="notifications" disabled>
-            Notifications
-          </TabsTrigger>
-        </TabsList>
-        <TabsContent value="overview" className="space-y-4">
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">
-                  Total Revenue
-                </CardTitle>
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  className="h-4 w-4 text-muted-foreground"
-                >
-                  <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
-                </svg>
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">$45,231.89</div>
-                <p className="text-xs text-muted-foreground">
-                  +20.1% from last month
-                </p>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">
-                  Subscriptions
-                </CardTitle>
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  className="h-4 w-4 text-muted-foreground"
-                >
-                  <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
-                  <circle cx="9" cy="7" r="4" />
-                  <path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75" />
-                </svg>
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">+2350</div>
-                <p className="text-xs text-muted-foreground">
-                  +180.1% from last month
-                </p>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Sales</CardTitle>
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  className="h-4 w-4 text-muted-foreground"
-                >
-                  <rect width="20" height="14" x="2" y="5" rx="2" />
-                  <path d="M2 10h20" />
-                </svg>
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">+12,234</div>
-                <p className="text-xs text-muted-foreground">
-                  +19% from last month
-                </p>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">
-                  Active Now
-                </CardTitle>
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  className="h-4 w-4 text-muted-foreground"
-                >
-                  <path d="M22 12h-4l-3 9L9 3l-3 9H2" />
-                </svg>
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">+573</div>
-                <p className="text-xs text-muted-foreground">
-                  +201 since last hour
-                </p>
-              </CardContent>
-            </Card>
-          </div>
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
-            <Card className="col-span-4">
-              <CardHeader>
-                <CardTitle>Overview</CardTitle>
-              </CardHeader>
-              <CardContent className="pl-2">
-                <Overview />
-              </CardContent>
-            </Card>
-            <Card className="col-span-3">
-              <CardHeader>
-                <CardTitle>Recent Sales</CardTitle>
-                <CardDescription>
-                  You made 265 sales this month.
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <RecentSales />
-              </CardContent>
-            </Card>
-          </div>
-        </TabsContent>
-      </Tabs>
-    </>
+    </div>
   );
 }
