@@ -1,6 +1,5 @@
 import { UseMutationOptions, useMutation } from '@tanstack/react-query';
-import { useCallback, useRef } from 'react';
-import { Toast, useToast } from '../use-toast';
+import { useToast } from '../use-toast';
 import { NotifyConfigs } from './types';
 
 export interface UseCustomMutationOptions<

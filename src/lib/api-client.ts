@@ -1,5 +1,5 @@
 import axios, { AxiosError } from 'axios';
-import { getStoredAccessToken } from './token';
+import { getStoredSessionData } from './token';
 
 const { VITE_API_ENDPOINT } = import.meta.env;
 
@@ -8,7 +8,7 @@ const apiClient = axios.create({
   headers: { 'Content-Type': 'application/json' },
 });
 
-const accessToken = getStoredAccessToken();
+const { accessToken } = getStoredSessionData() ?? {};
 
 if (accessToken)
   apiClient.defaults.headers.common.Authorization = `Bearer ${accessToken}`;

@@ -1,6 +1,14 @@
 import DataTable from '@/components/ui/data-table';
 
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
 import { Icons } from '@/components/ui/icons';
+import Spinner from '@/components/ui/spinner';
 import { TableCell, TableHead, TableRow } from '@/components/ui/table';
 import {
   DASHBOARD_QUERY_KEY_PREFIX,
@@ -11,19 +19,15 @@ import apiClient from '@/lib/api-client';
 import { Sample } from '@/models/sample';
 import { SecurityLevel } from '@/models/user';
 import { PaginatedResponse } from '@/types';
-import { useQuery } from '@tanstack/react-query';
+import { keepPreviousData, useQuery } from '@tanstack/react-query';
 import {
   ColumnFiltersState,
   ExpandedState,
   getCoreRowModel,
   getExpandedRowModel,
-  getFacetedRowModel,
-  getFacetedUniqueValues,
   getFilteredRowModel,
   getPaginationRowModel,
-  getSortedRowModel,
   PaginationState,
-  SortingState,
   useReactTable,
   VisibilityState,
 } from '@tanstack/react-table';
@@ -32,14 +36,7 @@ import { ChevronDown, ChevronsUpDown, ChevronUp } from 'lucide-react';
 import { useState } from 'react';
 import { columns } from './columns';
 import { SessionData } from './types';
-import Overlay from '@/components/ui/overlay';
-import {
-  Card,
-  CardHeader,
-  CardTitle,
-  CardDescription,
-  CardContent,
-} from '@/components/ui/card';
+import { DateRange } from 'react-day-picker';
 
 const DEFAULT_DATA: SessionData[] = [];
 
@@ -85,7 +82,7 @@ const ExpandingRow = ({ data }: { data: SessionData }) => {
     queryKey: [DASHBOARD_QUERY_KEY_PREFIX, SESSIONS_QUERY_KEY, data.id],
     queryFn: () =>
       apiClient
-        .get<PaginatedResponse<Sample & { id: string }>>('/api/samples', {
+        .get<PaginatedResponse<Sample & { id: string }>>('/api/samples/', {
           params: {
             session_id: data.id,
           },
@@ -134,7 +131,7 @@ const ExpandingRow = ({ data }: { data: SessionData }) => {
   );
 };
 
-const SessionsTable = () => {
+const SessionsTable = ({ dateRange }: { dateRange: DateRange }) => {
   const [pagination, setPagination] = useState<PaginationState>({
     pageIndex: 0,
     pageSize: 10,
@@ -143,22 +140,25 @@ const SessionsTable = () => {
   const [rowSelection, setRowSelection] = useState({});
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
-  const [sorting, setSorting] = useState<SortingState>([]);
-  const {
-    data: sessionsData,
-    isFetched: isFetchedSessions,
-    isPending,
-  } = useQuery({
-    queryKey: [DASHBOARD_QUERY_KEY_PREFIX, SESSIONS_QUERY_KEY, pagination],
+  const { data: sessionsData, isFetching } = useQuery({
+    queryKey: [
+      DASHBOARD_QUERY_KEY_PREFIX,
+      SESSIONS_QUERY_KEY,
+      pagination,
+      dateRange,
+    ],
     queryFn: () =>
       apiClient
-        .get<PaginatedResponse<SessionData>>('/api/sessions', {
+        .get<PaginatedResponse<SessionData>>('/api/sessions/', {
           params: {
             page: pagination.pageIndex + 1,
             page_size: pagination.pageSize,
+            start_date: dateRange.from,
+            end_date: dateRange.to,
           },
         })
         .then((res) => res.data),
+    placeholderData: keepPreviousData,
   });
 
   const { items: sessions = DEFAULT_DATA, total_items: totalItems = 0 } =
@@ -168,7 +168,6 @@ const SessionsTable = () => {
     data: sessions,
     columns,
     state: {
-      sorting,
       expanded,
       pagination,
       columnVisibility,
@@ -176,38 +175,34 @@ const SessionsTable = () => {
       columnFilters,
     },
     rowCount: totalItems,
+    manualPagination: true,
     enableRowSelection: true,
     onExpandedChange: setExpanded,
     onPaginationChange: setPagination,
     onRowSelectionChange: setRowSelection,
-    onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
     onColumnVisibilityChange: setColumnVisibility,
     getCoreRowModel: getCoreRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
-    getSortedRowModel: getSortedRowModel(),
-    getFacetedRowModel: getFacetedRowModel(),
-    getFacetedUniqueValues: getFacetedUniqueValues(),
     getExpandedRowModel: getExpandedRowModel(),
-    getRowCanExpand: () => true,
+    getRowCanExpand: (row) => row.original.samples[0].total_samples > 0,
   });
 
   return (
     <Card className="overflow-hidden">
-      <Overlay loading={isPending}>
-        <CardHeader>
-          <CardTitle>Recent Sessions</CardTitle>
-          <CardDescription></CardDescription>
-        </CardHeader>
-        <CardContent>
-          <DataTable<SessionData>
-            table={table}
-            columns={columns}
-            ExpandingRowComponent={ExpandingRow}
-          />
-        </CardContent>
-      </Overlay>
+      <CardHeader>
+        <CardTitle>Recent Sessions</CardTitle>
+        <CardDescription></CardDescription>
+      </CardHeader>
+      <CardContent>
+        <DataTable<SessionData>
+          table={table}
+          columns={columns}
+          loading={isFetching}
+          ExpandingRowComponent={ExpandingRow}
+        />
+      </CardContent>
     </Card>
   );
 };

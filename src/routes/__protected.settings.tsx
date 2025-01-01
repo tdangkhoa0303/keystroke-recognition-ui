@@ -1,5 +1,6 @@
-import { createFileRoute, Link } from '@tanstack/react-router';
+import { createFileRoute } from '@tanstack/react-router'
 
+import KeystrokeDynamicSettings from '@/components/pages/settings/kd-settings'
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -7,40 +8,18 @@ import {
   BreadcrumbList,
   BreadcrumbPage,
   BreadcrumbSeparator,
-} from '@/components/ui/breadcrumb';
+} from '@/components/ui/breadcrumb'
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from '@/components/ui/card';
-import {
-  Sidebar,
-  SidebarContent,
-  SidebarGroup,
-  SidebarGroupContent,
-  SidebarMenu,
-  SidebarMenuButton,
-  SidebarMenuItem,
-  SidebarProvider,
-} from '@/components/ui/sidebar';
-import { Bell, Lock, Menu, Paintbrush, Settings } from 'lucide-react';
-import KeystrokeDynamicSettings from '@/components/pages/settings/kd-settings';
+} from '@/components/ui/card'
 
-export const Route = createFileRoute('/__auth/settings')({
+export const Route = createFileRoute('/__protected/settings')({
   component: SettingsPage,
-});
-
-const data = {
-  nav: [
-    { name: 'Account', icon: Bell, path: '' },
-    { name: 'Security Settings', icon: Menu, path: '' },
-    { name: 'Appearance', icon: Paintbrush, path: '' },
-    { name: 'Privacy & visibility', icon: Lock, path: '' },
-    { name: 'Advanced', icon: Settings, path: '' },
-  ],
-};
+})
 
 function SettingsPage() {
   return (
@@ -79,5 +58,5 @@ function SettingsPage() {
       </main>
       <div className="flex justify-between items-center mb-2"></div>
     </>
-  );
+  )
 }

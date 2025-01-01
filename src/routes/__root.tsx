@@ -1,17 +1,15 @@
 import { Toaster } from '@/components/ui/toaster';
 import {
-  createRootRoute,
   createRootRouteWithContext,
-  Link,
   Outlet,
   ScrollRestoration,
 } from '@tanstack/react-router';
 import { TanStackRouterDevtools } from '@tanstack/router-devtools';
 
-import type { AuthContext } from '../auth';
+import type { AuthContextValue } from '../auth';
 
 interface RouterContext {
-  auth: AuthContext;
+  auth: AuthContextValue;
 }
 
 export const Route = createRootRouteWithContext<RouterContext>()({
@@ -24,7 +22,7 @@ function Root() {
       <Outlet />
       <Toaster />
       <ScrollRestoration />
-      <TanStackRouterDevtools />
+      {/* <TanStackRouterDevtools /> */}
     </>
   );
 }

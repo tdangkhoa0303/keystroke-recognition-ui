@@ -93,7 +93,7 @@ interface FormValues {
 const KeystrokeDynamicSettings = () => {
   const { user } = useAuth();
   const queryClient = useQueryClient();
-  const { mutate: trainModel, isPending: isTraining } = useCustomMutation({
+  const { mutate: trainModel, isFetching: isTraining } = useCustomMutation({
     mutationFn: () =>
       apiClient.post('/api/samples/train').then((response) => response.data),
     onSuccess: () =>
@@ -117,7 +117,7 @@ const KeystrokeDynamicSettings = () => {
 
   const {
     mutate: updateSecurityConfigs,
-    isPending: isUpdatingSecurityConfigs,
+    isFetching: isUpdatingSecurityConfigs,
   } = useCustomMutation({
     mutationFn: (data: FormValues) =>
       apiClient

@@ -9,7 +9,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import Overlay from '@/components/ui/overlay';
+import Overlay from '@/components/ui/spinner';
 import {
   DASHBOARD_QUERY_KEY_PREFIX,
   SAMPLES_QUERY_KEY,
@@ -19,19 +19,14 @@ import apiClient from '@/lib/api-client';
 import { Sample } from '@/models/sample';
 import { SecurityLevel } from '@/models/user';
 import { PaginatedResponse } from '@/types';
-import { useQuery } from '@tanstack/react-query';
+import { keepPreviousData, useQuery } from '@tanstack/react-query';
 import {
   ColumnFiltersState,
   createColumnHelper,
   getCoreRowModel,
   getExpandedRowModel,
-  getFacetedRowModel,
-  getFacetedUniqueValues,
-  getFilteredRowModel,
   getPaginationRowModel,
-  getSortedRowModel,
   PaginationState,
-  SortingState,
   useReactTable,
   VisibilityState,
 } from '@tanstack/react-table';
@@ -44,6 +39,9 @@ import {
   ChevronUp,
 } from 'lucide-react';
 import { useState } from 'react';
+import { DateRange } from 'react-day-picker';
+import Spinner from '@/components/ui/spinner';
+import { getNameAvatar } from '@/lib/utils';
 
 const SECURITY_LEVEL_ICONS = {
   [SecurityLevel.LOW]: ChevronDown,
@@ -61,7 +59,7 @@ type SampleData = {
 
 const columnHelper = createColumnHelper<SampleData>();
 
-export const columns = [
+const columns = [
   columnHelper.accessor('user', {
     header: ({ column }) => <DataTable.Header column={column} title="User" />,
     cell: ({ getValue, row }) => {
@@ -78,7 +76,7 @@ export const columns = [
               src={`https://avatar.iran.liara.run/public?username=${userName}`}
               alt={userName}
             />
-            <AvatarFallback>{userName}</AvatarFallback>
+            <AvatarFallback>{getNameAvatar(userName)}</AvatarFallback>
           </Avatar>
           <div className="font-medium whitespace-nowrap">{userName}</div>
         </div>
@@ -128,9 +126,9 @@ export const columns = [
     ),
     cell: ({ getValue }) => {
       return getValue() ? (
-        <BanIcon className="text-red-500" />
-      ) : (
         <CheckCircle className="text-green-500" />
+      ) : (
+        <BanIcon className="text-red-500" />
       );
     },
     enableSorting: false,
@@ -148,7 +146,7 @@ export const columns = [
   }),
 ];
 
-const RecentVerifications = () => {
+const RecentVerifications = ({ dateRange }: { dateRange: DateRange }) => {
   const [pagination, setPagination] = useState<PaginationState>({
     pageIndex: 0,
     pageSize: 6,
@@ -156,18 +154,25 @@ const RecentVerifications = () => {
 
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
-  const [sorting, setSorting] = useState<SortingState>([]);
-  const { data: samplesData, isPending: isFetchingSamples } = useQuery({
-    queryKey: [DASHBOARD_QUERY_KEY_PREFIX, SAMPLES_QUERY_KEY, pagination],
+  const { data: samplesData, isFetching: isFetchingSamples } = useQuery({
+    queryKey: [
+      DASHBOARD_QUERY_KEY_PREFIX,
+      SAMPLES_QUERY_KEY,
+      pagination,
+      dateRange,
+    ],
     queryFn: () =>
       apiClient
-        .get<PaginatedResponse<SampleData>>('/api/samples', {
+        .get<PaginatedResponse<SampleData>>('/api/samples/', {
           params: {
             page: pagination.pageIndex + 1,
             page_size: pagination.pageSize,
+            start_date: dateRange.from,
+            end_date: dateRange.to,
           },
         })
         .then((res) => res.data),
+    placeholderData: keepPreviousData,
   });
 
   const { items: samples = [], total_items: totalItems = 0 } =
@@ -177,7 +182,6 @@ const RecentVerifications = () => {
     data: samples,
     columns,
     state: {
-      sorting,
       pagination,
       columnVisibility,
       columnFilters,
@@ -185,36 +189,30 @@ const RecentVerifications = () => {
     rowCount: totalItems,
     manualPagination: true,
     onPaginationChange: setPagination,
-    onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
     onColumnVisibilityChange: setColumnVisibility,
     getCoreRowModel: getCoreRowModel(),
-    getFilteredRowModel: getFilteredRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
-    getSortedRowModel: getSortedRowModel(),
-    getFacetedRowModel: getFacetedRowModel(),
-    getFacetedUniqueValues: getFacetedUniqueValues(),
     getExpandedRowModel: getExpandedRowModel(),
     getRowCanExpand: () => true,
   });
 
   return (
     <Card className="w-full h-full overflow-hidden">
-      <Overlay loading={isFetchingSamples}>
-        <CardHeader>
-          <CardTitle>Recent Verifications</CardTitle>
-          <CardDescription>
-            Observe the current verification results
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <DataTable<SampleData>
-            table={table}
-            columns={columns}
-            pageSizeOptions={[6, 12, 24]}
-          />
-        </CardContent>
-      </Overlay>
+      <CardHeader>
+        <CardTitle>Recent Verifications</CardTitle>
+        <CardDescription>
+          Observe the current verification results
+        </CardDescription>
+      </CardHeader>
+      <CardContent>
+        <DataTable<SampleData>
+          table={table}
+          columns={columns}
+          pageSizeOptions={[6, 12, 24]}
+          loading={isFetchingSamples}
+        />
+      </CardContent>
     </Card>
   );
 };

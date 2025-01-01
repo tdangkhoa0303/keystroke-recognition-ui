@@ -1,27 +1,42 @@
 import { cn } from '@/lib/utils';
-import { ReactNode } from 'react';
+import { HTMLAttributes } from 'react';
+import { HashLoader } from 'react-spinners';
 
-interface SpinnerProps {
-  loading?: boolean;
-  className?: string;
-  children?: ReactNode;
+export interface SpinnerProps extends HTMLAttributes<HTMLDivElement> {
+  size?: number;
+  loading: boolean;
+  withBackground?: boolean;
 }
 
-const Spinner = ({ loading, children, className }: SpinnerProps) => (
-  <div className="relative w-full">
-    <div className="absolute top-[50%] left-[50%] bg-white w-10 h-10 translate-x-[50%] translate-y-[-50%]" />
-    {loading !== false && (
-      <div className="flex absolute top-[50%] left-[50%]">
-        <span
-          className={cn('relative w-[120px] h-[90px] my-0 mx-auto', className)}
-        >
-          <span className="absolute h-1 w-8 rounded-sm shadow-sm animate-loading-step top-0 right-0" />
-          <span className="absolute bottom-[50%] left-[50%] translate-x-[50%] translate-y-[-50%] h-5 w-5 rounded-full animate-loading-bounce bg-orange-600" />
-        </span>
-      </div>
-    )}
-    {children}
-  </div>
-);
+const SPINNER_COLOR = '#00AB55';
+
+const Spinner = ({
+  loading,
+  children,
+  className,
+  size = 40,
+  ...props
+}: SpinnerProps) => {
+  if (!children)
+    return loading ? <HashLoader size={size} color={SPINNER_COLOR} /> : null;
+
+  return (
+    <div
+      className={cn('relative w-full h-full rounded-md min-h-10', className)}
+      {...props}
+    >
+      {loading && (
+        <>
+          <div className="!absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-50">
+            <HashLoader size={size} color={SPINNER_COLOR} />
+          </div>
+          <div className="w-full h-full absolute bg-slate-200 bg-opacity-10" />
+        </>
+      )}
+
+      {children}
+    </div>
+  );
+};
 
 export default Spinner;

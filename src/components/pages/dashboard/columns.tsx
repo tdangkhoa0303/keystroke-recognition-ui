@@ -10,27 +10,13 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from '@/components/ui/tooltip';
-import { cn } from '@/lib/utils';
+import { cn, getNameAvatar } from '@/lib/utils';
 import { format } from 'date-fns';
 import { BanIcon, CheckCircle, ChevronDown } from 'lucide-react';
 import { DataTableRowActions } from './data-table-row-actions';
 import { SessionData } from './types';
 
 const columnHelper = createColumnHelper<SessionData>();
-
-function getNameAvatar(name: string) {
-  if (!name || typeof name !== 'string') {
-    return 'KD';
-  }
-
-  const parts = name.trim().split(/\s+/);
-  const rawName =
-    parts.length > 1
-      ? `${parts[0][0]}${parts[1][0]}`
-      : `${parts[0][0]}${parts[0][0]}`;
-
-  return rawName.toUpperCase();
-}
 
 export const columns = [
   columnHelper.display({
@@ -69,17 +55,19 @@ export const columns = [
           onClick={row.getToggleExpandedHandler()}
         >
           <div className="w-4 h-4">
-            <ChevronDown
-              className={cn(
-                'transition-all ease-in-out w-4 h-4',
-                row.getIsExpanded() ? 'rotate-0' : '-rotate-90'
-              )}
-            />
+            {row.getCanExpand() && (
+              <ChevronDown
+                className={cn(
+                  'transition-all ease-in-out w-4 h-4',
+                  row.getIsExpanded() ? 'rotate-0' : '-rotate-90'
+                )}
+              />
+            )}
           </div>
           <Avatar className="h-6 w-6">
             <AvatarImage
               src={`https://avatar.iran.liara.run/public?username=${userName}`}
-              alt={getNameAvatar(userName)}
+              alt={userName}
             />
             <AvatarFallback>{getNameAvatar(userName)}</AvatarFallback>
           </Avatar>
@@ -137,7 +125,13 @@ export const columns = [
 
       return (
         <div className="flex items-center gap-2">
-          <span>{total_legitimate}</span>/<span>{total_samples}</span>
+          {total_samples ? (
+            <>
+              <span>{total_legitimate}</span>/<span>{total_samples}</span>{' '}
+            </>
+          ) : (
+            '-'
+          )}
         </div>
       );
     },

@@ -1,7 +1,6 @@
 import { CalendarIcon } from '@radix-ui/react-icons';
-import { format, subDays } from 'date-fns';
-import * as React from 'react';
-import { DateRange } from 'react-day-picker';
+import { format, set } from 'date-fns';
+import { DateRange, SelectRangeEventHandler } from 'react-day-picker';
 
 import { Button } from '@/components/ui/button';
 import { Calendar } from '@/components/ui/calendar';
@@ -11,38 +10,50 @@ import {
   PopoverTrigger,
 } from '@/components/ui/popover';
 import { cn } from '@/lib/utils';
+import { useState } from 'react';
 
-const TODAY = new Date();
+interface CalendarDateRangePickerProps {
+  value?: DateRange;
+  className?: string;
+  onChange: (selectedDateRange: DateRange | undefined) => void;
+}
 
 export function CalendarDateRangePicker({
+  onChange,
   className,
-}: React.HTMLAttributes<HTMLDivElement>) {
-  const [date, setDate] = React.useState<DateRange | undefined>({
-    from: subDays(TODAY, 14),
-    to: TODAY,
-  });
+  value: dateRangeValue,
+}: CalendarDateRangePickerProps) {
+  const [internalValue, setInternalValue] = useState<DateRange | undefined>(
+    dateRangeValue
+  );
 
   return (
     <div className={cn('grid gap-2', className)}>
-      <Popover>
+      <Popover
+        onOpenChange={(open) => {
+          if (!open) {
+            onChange(internalValue);
+          }
+        }}
+      >
         <PopoverTrigger asChild>
           <Button
             id="date"
             variant={'outline'}
             className={cn(
               'w-[260px] justify-start text-left font-normal',
-              !date && 'text-muted-foreground'
+              !internalValue && 'text-muted-foreground'
             )}
           >
             <CalendarIcon className="mr-2 h-4 w-4" />
-            {date?.from ? (
-              date.to ? (
+            {internalValue?.from ? (
+              internalValue.to ? (
                 <>
-                  {format(date.from, 'LLL dd, y')} -{' '}
-                  {format(date.to, 'LLL dd, y')}
+                  {format(internalValue.from, 'LLL dd, y')} -{' '}
+                  {format(internalValue.to, 'LLL dd, y')}
                 </>
               ) : (
-                format(date.from, 'LLL dd, y')
+                format(internalValue.from, 'LLL dd, y')
               )
             ) : (
               <span>Pick a date</span>
@@ -53,9 +64,9 @@ export function CalendarDateRangePicker({
           <Calendar
             initialFocus
             mode="range"
-            defaultMonth={date?.from}
-            selected={date}
-            onSelect={setDate}
+            defaultMonth={internalValue?.from}
+            selected={internalValue}
+            onSelect={setInternalValue}
             numberOfMonths={2}
           />
         </PopoverContent>
