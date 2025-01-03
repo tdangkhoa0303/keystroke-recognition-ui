@@ -4,62 +4,76 @@ import {
   useCallback,
   useContext,
   createContext,
+  useEffect,
+  useMemo,
 } from 'react';
 
 import { User } from './models/user';
 import { useQuery } from '@tanstack/react-query';
 import apiClient from './lib/api-client';
 import { queryClient } from './lib/query-client';
-import { getStoredAccessToken, storeAccessToken } from './lib/token';
-import { Icons } from './components/ui/icons';
+import {
+  getStoredSessionData,
+  storeSessionData,
+  UserSessionData,
+} from './lib/token';
 import { USER_PROFILE_QUERY_KEY } from './constants/query-keys';
+import Spinner from './components/ui/spinner';
 
-export interface AuthContext {
+export interface AuthContextValue {
   isAuthenticated: boolean;
   logout: () => Promise<void>;
-  login: (accessToken: string) => Promise<void>;
+  login: (session: UserSessionData) => Promise<void>;
   user: User | null;
+  sessionData: UserSessionData | null;
 }
 
-const AuthContext = createContext<AuthContext | null>(null);
+const AuthContext = createContext<AuthContextValue | null>(null);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [accessToken, setStoredAccessToken] = useState<string | null>(
-    getStoredAccessToken()
+  const [sessionData, setStoredSessionData] = useState<UserSessionData | null>(
+    getStoredSessionData()
   );
 
+  useEffect(() => {
+    storeSessionData(sessionData);
+  }, [sessionData]);
+
+  const shouldFetchUserProfile = !!sessionData && sessionData.pending === false;
   const { data: user = null, isFetched } = useQuery({
     queryKey: [USER_PROFILE_QUERY_KEY],
     queryFn: () => apiClient.get<User>('/api/users/me').then((res) => res.data),
-    enabled: !!accessToken,
-    initialData: accessToken ? undefined : null,
+    enabled: shouldFetchUserProfile,
+    initialData: sessionData ? undefined : null,
   });
 
   const logout = useCallback(async () => {
-    storeAccessToken(null);
-    setStoredAccessToken(null);
+    storeSessionData(null);
+    setStoredSessionData(null);
     queryClient.removeQueries({
       queryKey: [USER_PROFILE_QUERY_KEY],
     });
   }, []);
 
-  const login = useCallback(async (accessToken: string) => {
-    storeAccessToken(accessToken);
-    setStoredAccessToken(accessToken);
+  const login = useCallback(async (session: UserSessionData) => {
+    setStoredSessionData(session);
   }, []);
 
-  if (accessToken && !isFetched) {
+  const authContextValue = useMemo(
+    () => ({ isAuthenticated: !!user, sessionData, user, logout, login }),
+    [login, logout, sessionData, user]
+  );
+
+  if (shouldFetchUserProfile && !isFetched) {
     return (
-      <div className="w-screen h-screen flex items-center justify-center">
-        <Icons.spinner className="mr-2 h-12 w-12 animate-spin" />
+      <div className="flex w-screen h-screen items-center justify-center">
+        <Spinner loading />
       </div>
     );
   }
 
   return (
-    <AuthContext.Provider
-      value={{ isAuthenticated: !!user, user, logout, login }}
-    >
+    <AuthContext.Provider value={authContextValue}>
       {children}
     </AuthContext.Provider>
   );

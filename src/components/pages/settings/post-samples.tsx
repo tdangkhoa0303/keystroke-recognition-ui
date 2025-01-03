@@ -2,6 +2,7 @@ import { CheckboxField, TrackedTextField } from '@/components/form';
 import { Button } from '@/components/ui/button';
 import { Form } from '@/components/ui/form';
 import { Icons } from '@/components/ui/icons';
+import { CHALLENGE_TEXT } from '@/constants/texts';
 import { useCustomMutation } from '@/hooks/api';
 import apiClient from '@/lib/api-client';
 import { generateKeystrokeSamples } from '@/lib/tracker';
@@ -49,7 +50,7 @@ const PostSamples = ({
       <form autoComplete="off" className="flex flex-col gap-4">
         <TrackedTextField
           name="sample1"
-          label="When the dream come true, we go to bed"
+          label={CHALLENGE_TEXT}
           inputProps={{
             placeholder: 'Enter the text below to submit your sample...',
             onKeystokeEventsChange: (events: KeystrokeEvent[]) => {
@@ -59,7 +60,7 @@ const PostSamples = ({
         />
         <TrackedTextField
           name="sample2"
-          label="When the dream come true, we go to bed"
+          label={CHALLENGE_TEXT}
           inputProps={{
             placeholder: 'Enter the text below to submit your sample...',
             onKeystokeEventsChange: (events: KeystrokeEvent[]) => {

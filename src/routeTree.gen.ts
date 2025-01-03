@@ -10,13 +10,14 @@
 
 // Import Routes
 
-import { Route as rootRoute } from './routes/__root';
-import { Route as SignUpImport } from './routes/sign-up';
-import { Route as SignInImport } from './routes/sign-in';
-import { Route as authImport } from './routes/__auth';
-import { Route as authIndexImport } from './routes/__auth.index';
-import { Route as authSettingsImport } from './routes/__auth.settings';
-import { Route as authDashboardImport } from './routes/__auth.dashboard';
+import { Route as rootRoute } from './routes/__root'
+import { Route as SignUpImport } from './routes/sign-up'
+import { Route as protectedImport } from './routes/__protected'
+import { Route as authImport } from './routes/__auth'
+import { Route as protectedIndexImport } from './routes/__protected.index'
+import { Route as protectedSettingsImport } from './routes/__protected.settings'
+import { Route as protectedDashboardImport } from './routes/__protected.dashboard'
+import { Route as authSignInImport } from './routes/__auth.sign-in'
 
 // Create/Update Routes
 
@@ -24,160 +25,187 @@ const SignUpRoute = SignUpImport.update({
   id: '/sign-up',
   path: '/sign-up',
   getParentRoute: () => rootRoute,
-} as any);
+} as any)
 
-const SignInRoute = SignInImport.update({
-  id: '/sign-in',
-  path: '/sign-in',
+const protectedRoute = protectedImport.update({
+  id: '/__protected',
   getParentRoute: () => rootRoute,
-} as any);
+} as any)
 
 const authRoute = authImport.update({
   id: '/__auth',
   getParentRoute: () => rootRoute,
-} as any);
+} as any)
 
-const authIndexRoute = authIndexImport.update({
+const protectedIndexRoute = protectedIndexImport.update({
   id: '/',
   path: '/',
-  getParentRoute: () => authRoute,
-} as any);
+  getParentRoute: () => protectedRoute,
+} as any)
 
-const authSettingsRoute = authSettingsImport.update({
+const protectedSettingsRoute = protectedSettingsImport.update({
   id: '/settings',
   path: '/settings',
-  getParentRoute: () => authRoute,
-} as any);
+  getParentRoute: () => protectedRoute,
+} as any)
 
-const authDashboardRoute = authDashboardImport.update({
+const protectedDashboardRoute = protectedDashboardImport.update({
   id: '/dashboard',
   path: '/dashboard',
+  getParentRoute: () => protectedRoute,
+} as any)
+
+const authSignInRoute = authSignInImport.update({
+  id: '/sign-in',
+  path: '/sign-in',
   getParentRoute: () => authRoute,
-} as any);
+} as any)
 
 // Populate the FileRoutesByPath interface
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
     '/__auth': {
-      id: '/__auth';
-      path: '';
-      fullPath: '';
-      preLoaderRoute: typeof authImport;
-      parentRoute: typeof rootRoute;
-    };
-    '/sign-in': {
-      id: '/sign-in';
-      path: '/sign-in';
-      fullPath: '/sign-in';
-      preLoaderRoute: typeof SignInImport;
-      parentRoute: typeof rootRoute;
-    };
+      id: '/__auth'
+      path: ''
+      fullPath: ''
+      preLoaderRoute: typeof authImport
+      parentRoute: typeof rootRoute
+    }
+    '/__protected': {
+      id: '/__protected'
+      path: ''
+      fullPath: ''
+      preLoaderRoute: typeof protectedImport
+      parentRoute: typeof rootRoute
+    }
     '/sign-up': {
-      id: '/sign-up';
-      path: '/sign-up';
-      fullPath: '/sign-up';
-      preLoaderRoute: typeof SignUpImport;
-      parentRoute: typeof rootRoute;
-    };
-    '/__auth/dashboard': {
-      id: '/__auth/dashboard';
-      path: '/dashboard';
-      fullPath: '/dashboard';
-      preLoaderRoute: typeof authDashboardImport;
-      parentRoute: typeof authImport;
-    };
-    '/__auth/settings': {
-      id: '/__auth/settings';
-      path: '/settings';
-      fullPath: '/settings';
-      preLoaderRoute: typeof authSettingsImport;
-      parentRoute: typeof authImport;
-    };
-    '/__auth/': {
-      id: '/__auth/';
-      path: '/';
-      fullPath: '/';
-      preLoaderRoute: typeof authIndexImport;
-      parentRoute: typeof authImport;
-    };
+      id: '/sign-up'
+      path: '/sign-up'
+      fullPath: '/sign-up'
+      preLoaderRoute: typeof SignUpImport
+      parentRoute: typeof rootRoute
+    }
+    '/__auth/sign-in': {
+      id: '/__auth/sign-in'
+      path: '/sign-in'
+      fullPath: '/sign-in'
+      preLoaderRoute: typeof authSignInImport
+      parentRoute: typeof authImport
+    }
+    '/__protected/dashboard': {
+      id: '/__protected/dashboard'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof protectedDashboardImport
+      parentRoute: typeof protectedImport
+    }
+    '/__protected/settings': {
+      id: '/__protected/settings'
+      path: '/settings'
+      fullPath: '/settings'
+      preLoaderRoute: typeof protectedSettingsImport
+      parentRoute: typeof protectedImport
+    }
+    '/__protected/': {
+      id: '/__protected/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof protectedIndexImport
+      parentRoute: typeof protectedImport
+    }
   }
 }
 
 // Create and export the route tree
 
 interface authRouteChildren {
-  authDashboardRoute: typeof authDashboardRoute;
-  authSettingsRoute: typeof authSettingsRoute;
-  authIndexRoute: typeof authIndexRoute;
+  authSignInRoute: typeof authSignInRoute
 }
 
 const authRouteChildren: authRouteChildren = {
-  authDashboardRoute: authDashboardRoute,
-  authSettingsRoute: authSettingsRoute,
-  authIndexRoute: authIndexRoute,
-};
+  authSignInRoute: authSignInRoute,
+}
 
-const authRouteWithChildren = authRoute._addFileChildren(authRouteChildren);
+const authRouteWithChildren = authRoute._addFileChildren(authRouteChildren)
+
+interface protectedRouteChildren {
+  protectedDashboardRoute: typeof protectedDashboardRoute
+  protectedSettingsRoute: typeof protectedSettingsRoute
+  protectedIndexRoute: typeof protectedIndexRoute
+}
+
+const protectedRouteChildren: protectedRouteChildren = {
+  protectedDashboardRoute: protectedDashboardRoute,
+  protectedSettingsRoute: protectedSettingsRoute,
+  protectedIndexRoute: protectedIndexRoute,
+}
+
+const protectedRouteWithChildren = protectedRoute._addFileChildren(
+  protectedRouteChildren,
+)
 
 export interface FileRoutesByFullPath {
-  '': typeof authRouteWithChildren;
-  '/sign-in': typeof SignInRoute;
-  '/sign-up': typeof SignUpRoute;
-  '/dashboard': typeof authDashboardRoute;
-  '/settings': typeof authSettingsRoute;
-  '/': typeof authIndexRoute;
+  '': typeof protectedRouteWithChildren
+  '/sign-up': typeof SignUpRoute
+  '/sign-in': typeof authSignInRoute
+  '/dashboard': typeof protectedDashboardRoute
+  '/settings': typeof protectedSettingsRoute
+  '/': typeof protectedIndexRoute
 }
 
 export interface FileRoutesByTo {
-  '/sign-in': typeof SignInRoute;
-  '/sign-up': typeof SignUpRoute;
-  '/dashboard': typeof authDashboardRoute;
-  '/settings': typeof authSettingsRoute;
-  '/': typeof authIndexRoute;
+  '': typeof authRouteWithChildren
+  '/sign-up': typeof SignUpRoute
+  '/sign-in': typeof authSignInRoute
+  '/dashboard': typeof protectedDashboardRoute
+  '/settings': typeof protectedSettingsRoute
+  '/': typeof protectedIndexRoute
 }
 
 export interface FileRoutesById {
-  __root__: typeof rootRoute;
-  '/__auth': typeof authRouteWithChildren;
-  '/sign-in': typeof SignInRoute;
-  '/sign-up': typeof SignUpRoute;
-  '/__auth/dashboard': typeof authDashboardRoute;
-  '/__auth/settings': typeof authSettingsRoute;
-  '/__auth/': typeof authIndexRoute;
+  __root__: typeof rootRoute
+  '/__auth': typeof authRouteWithChildren
+  '/__protected': typeof protectedRouteWithChildren
+  '/sign-up': typeof SignUpRoute
+  '/__auth/sign-in': typeof authSignInRoute
+  '/__protected/dashboard': typeof protectedDashboardRoute
+  '/__protected/settings': typeof protectedSettingsRoute
+  '/__protected/': typeof protectedIndexRoute
 }
 
 export interface FileRouteTypes {
-  fileRoutesByFullPath: FileRoutesByFullPath;
-  fullPaths: '' | '/sign-in' | '/sign-up' | '/dashboard' | '/settings' | '/';
-  fileRoutesByTo: FileRoutesByTo;
-  to: '/sign-in' | '/sign-up' | '/dashboard' | '/settings' | '/';
+  fileRoutesByFullPath: FileRoutesByFullPath
+  fullPaths: '' | '/sign-up' | '/sign-in' | '/dashboard' | '/settings' | '/'
+  fileRoutesByTo: FileRoutesByTo
+  to: '' | '/sign-up' | '/sign-in' | '/dashboard' | '/settings' | '/'
   id:
     | '__root__'
     | '/__auth'
-    | '/sign-in'
+    | '/__protected'
     | '/sign-up'
-    | '/__auth/dashboard'
-    | '/__auth/settings'
-    | '/__auth/';
-  fileRoutesById: FileRoutesById;
+    | '/__auth/sign-in'
+    | '/__protected/dashboard'
+    | '/__protected/settings'
+    | '/__protected/'
+  fileRoutesById: FileRoutesById
 }
 
 export interface RootRouteChildren {
-  authRoute: typeof authRouteWithChildren;
-  SignInRoute: typeof SignInRoute;
-  SignUpRoute: typeof SignUpRoute;
+  authRoute: typeof authRouteWithChildren
+  protectedRoute: typeof protectedRouteWithChildren
+  SignUpRoute: typeof SignUpRoute
 }
 
 const rootRouteChildren: RootRouteChildren = {
   authRoute: authRouteWithChildren,
-  SignInRoute: SignInRoute,
+  protectedRoute: protectedRouteWithChildren,
   SignUpRoute: SignUpRoute,
-};
+}
 
 export const routeTree = rootRoute
   ._addFileChildren(rootRouteChildren)
-  ._addFileTypes<FileRouteTypes>();
+  ._addFileTypes<FileRouteTypes>()
 
 /* prettier-ignore-end */
 
@@ -188,35 +216,42 @@ export const routeTree = rootRoute
       "filePath": "__root.tsx",
       "children": [
         "/__auth",
-        "/sign-in",
+        "/__protected",
         "/sign-up"
       ]
     },
     "/__auth": {
       "filePath": "__auth.tsx",
       "children": [
-        "/__auth/dashboard",
-        "/__auth/settings",
-        "/__auth/"
+        "/__auth/sign-in"
       ]
     },
-    "/sign-in": {
-      "filePath": "sign-in.tsx"
+    "/__protected": {
+      "filePath": "__protected.tsx",
+      "children": [
+        "/__protected/dashboard",
+        "/__protected/settings",
+        "/__protected/"
+      ]
     },
     "/sign-up": {
       "filePath": "sign-up.tsx"
     },
-    "/__auth/dashboard": {
-      "filePath": "__auth.dashboard.tsx",
+    "/__auth/sign-in": {
+      "filePath": "__auth.sign-in.tsx",
       "parent": "/__auth"
     },
-    "/__auth/settings": {
-      "filePath": "__auth.settings.tsx",
-      "parent": "/__auth"
+    "/__protected/dashboard": {
+      "filePath": "__protected.dashboard.tsx",
+      "parent": "/__protected"
     },
-    "/__auth/": {
-      "filePath": "__auth.index.tsx",
-      "parent": "/__auth"
+    "/__protected/settings": {
+      "filePath": "__protected.settings.tsx",
+      "parent": "/__protected"
+    },
+    "/__protected/": {
+      "filePath": "__protected.index.tsx",
+      "parent": "/__protected"
     }
   }
 }

@@ -5,3 +5,5 @@ export const SECURITY_LEVEL_TEXTS = {
   [SecurityLevel.MEDIUM]: 'Medium',
   [SecurityLevel.HIGH]: 'High',
 };
+
+export const CHALLENGE_TEXT = 'When the stars align, we dance all night';

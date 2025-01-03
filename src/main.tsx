@@ -3,19 +3,23 @@ import { RouterProvider, createRouter } from '@tanstack/react-router';
 import ReactDOM from 'react-dom/client';
 import { routeTree } from './routeTree.gen';
 
+import React from 'react';
+import { AuthProvider, useAuth } from './auth';
+import { ThemeProvider } from './components/theme-provider';
 import { queryClient } from './lib/query-client';
 import './styles.css';
-import { AuthProvider, useAuth } from './auth';
-import React, { useEffect, useState } from 'react';
-import { ThemeProvider } from './components/theme-provider';
-import TypingContext, { TypingInstance } from './context';
-import TypingDNA from './vendors/tdna';
 
 // Set up a Router instance
 const router = createRouter({
   routeTree,
   context: {
-    auth: undefined!,
+    auth: {
+      isAuthenticated: false,
+      user: null,
+      sessionData: null,
+      logout: async () => undefined,
+      login: async () => undefined,
+    },
   },
   defaultPreload: 'intent',
   // Since we're using React Query, we don't want loader calls to ever be stale
@@ -32,19 +36,8 @@ declare module '@tanstack/react-router' {
 
 function InnerApp() {
   const auth = useAuth();
-  const [tdnaInstance, setTdnaInstance] = useState<TypingInstance | null>(null);
 
-  useEffect(() => {
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-expect-error
-    setTdnaInstance(new TypingDNA());
-  }, []);
-
-  return (
-    <TypingContext value={tdnaInstance}>
-      <RouterProvider router={router} context={{ auth }} />
-    </TypingContext>
-  );
+  return <RouterProvider router={router} context={{ auth }} />;
 }
 
 function App() {

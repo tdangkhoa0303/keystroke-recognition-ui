@@ -32,10 +32,6 @@ export function DataTableRowActions<TData>({
         <DropdownMenuItem>
           <ExitIcon /> Revoke
         </DropdownMenuItem>
-        <DropdownMenuItem>
-          <EyeIcon />
-          View Details
-        </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
   );

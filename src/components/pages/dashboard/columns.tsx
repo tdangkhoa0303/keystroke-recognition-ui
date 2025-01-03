@@ -2,7 +2,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { createColumnHelper } from '@tanstack/react-table';
 
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Badge } from '@/components/ui/badge';
+import { Badge, BadgeProps } from '@/components/ui/badge';
 import DataTable from '@/components/ui/data-table';
 import {
   Tooltip,
@@ -10,27 +10,28 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from '@/components/ui/tooltip';
-import { cn } from '@/lib/utils';
+import { cn, getNameAvatar } from '@/lib/utils';
 import { format } from 'date-fns';
-import { BanIcon, CheckCircle, ChevronDown } from 'lucide-react';
+import { ChevronDown } from 'lucide-react';
 import { DataTableRowActions } from './data-table-row-actions';
-import { SessionData } from './types';
+import { SessionData, SessionStatus } from './types';
+
+const BADGE_VARIANTS_BY_STATUSES: Record<SessionStatus, BadgeProps['variant']> =
+  {
+    [SessionStatus.ACTIVE]: 'default',
+    [SessionStatus.REVOKED]: 'destructive',
+    [SessionStatus.EXPIRED]: 'secondary',
+    [SessionStatus.PENDING]: 'outline',
+  };
+
+const STATUS_TEXTS: Record<SessionStatus, string> = {
+  [SessionStatus.ACTIVE]: 'Activated',
+  [SessionStatus.REVOKED]: 'Revoked',
+  [SessionStatus.EXPIRED]: 'Expired',
+  [SessionStatus.PENDING]: 'Pending',
+};
 
 const columnHelper = createColumnHelper<SessionData>();
-
-function getNameAvatar(name: string) {
-  if (!name || typeof name !== 'string') {
-    return 'KD';
-  }
-
-  const parts = name.trim().split(/\s+/);
-  const rawName =
-    parts.length > 1
-      ? `${parts[0][0]}${parts[1][0]}`
-      : `${parts[0][0]}${parts[0][0]}`;
-
-  return rawName.toUpperCase();
-}
 
 export const columns = [
   columnHelper.display({
@@ -69,17 +70,19 @@ export const columns = [
           onClick={row.getToggleExpandedHandler()}
         >
           <div className="w-4 h-4">
-            <ChevronDown
-              className={cn(
-                'transition-all ease-in-out w-4 h-4',
-                row.getIsExpanded() ? 'rotate-0' : '-rotate-90'
-              )}
-            />
+            {row.getCanExpand() && (
+              <ChevronDown
+                className={cn(
+                  'transition-all ease-in-out w-4 h-4',
+                  row.getIsExpanded() ? 'rotate-0' : '-rotate-90'
+                )}
+              />
+            )}
           </div>
           <Avatar className="h-6 w-6">
             <AvatarImage
               src={`https://avatar.iran.liara.run/public?username=${userName}`}
-              alt={getNameAvatar(userName)}
+              alt={userName}
             />
             <AvatarFallback>{getNameAvatar(userName)}</AvatarFallback>
           </Avatar>
@@ -132,29 +135,36 @@ export const columns = [
     header: ({ column }) => (
       <DataTable.Header column={column} title="Success Rate" />
     ),
-    cell: ({ getValue, row }) => {
+    cell: ({ getValue }) => {
       const [{ total_legitimate, total_samples }] = getValue();
 
       return (
         <div className="flex items-center gap-2">
-          <span>{total_legitimate}</span>/<span>{total_samples}</span>
+          {total_samples ? (
+            <>
+              <span>{total_legitimate}</span>/<span>{total_samples}</span>{' '}
+            </>
+          ) : (
+            '-'
+          )}
         </div>
       );
     },
     enableSorting: false,
     enableHiding: false,
   }),
-  columnHelper.accessor('is_revoked', {
+  columnHelper.accessor('status', {
     header: ({ column }) => (
-      <DataTable.Header column={column} title="Validity" className="min-w-20" />
+      <DataTable.Header column={column} title="Status" className="min-w-20" />
     ),
-    cell: ({ getValue }) => {
-      return getValue() ? (
-        <BanIcon className="text-red-500" />
-      ) : (
-        <CheckCircle className="text-green-500" />
-      );
-    },
+    cell: ({ getValue }) => (
+      <Badge
+        className="uppercase"
+        variant={BADGE_VARIANTS_BY_STATUSES[getValue()]}
+      >
+        {STATUS_TEXTS[getValue()]}
+      </Badge>
+    ),
     enableSorting: false,
     enableHiding: false,
   }),

@@ -5,7 +5,6 @@ import { Button, buttonVariants } from '@/components/ui/button';
 import { Form } from '@/components/ui/form';
 import { Icons } from '@/components/ui/icons';
 import { Label } from '@/components/ui/label';
-import { useTypingInstance } from '@/context';
 import apiClient from '@/lib/api-client';
 import { generateKeystrokeSamples } from '@/lib/tracker';
 import { cn } from '@/lib/utils';
@@ -16,8 +15,10 @@ import { createFileRoute, Link, useNavigate } from '@tanstack/react-router';
 import { useCallback, useRef } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
+import { motion } from 'framer-motion';
 
 import Logo from '@/components/logo';
+import { CHALLENGE_TEXT } from '@/constants/texts';
 
 export const Route = createFileRoute('/sign-up')({
   component: SignUp,
@@ -91,8 +92,15 @@ function SignUp() {
         >
           Login
         </Link>
-        <div className="relative hidden h-full flex-col bg-muted p-10 text-white dark:border-r lg:flex">
-          <div className="absolute inset-0 bg-zinc-900" />
+        <div
+          className="relative hidden h-full flex-col p-10 text-white dark:border-r lg:flex"
+          style={{
+            backgroundSize: 'cover',
+            backgroundImage: 'url("/decorator-2.jpg")',
+            backgroundPosition: 'center',
+          }}
+        >
+          <div className="absolute inset-0" />
           <div className="relative z-20 flex items-center text-lg font-medium">
             <Logo className="w-10 h-10 mr-2" />
             KDR | Keystroke Dynamics Recognition
@@ -100,11 +108,9 @@ function SignUp() {
           <div className="relative z-20 mt-auto">
             <blockquote className="space-y-2">
               <p className="text-lg">
-                &ldquo;This library has saved me countless hours of work and
-                helped me deliver stunning designs to my clients faster than
-                ever before.&rdquo;
+                &ldquo;Unlock a new era of security. Gone are the days of
+                forgotten passwords and vulnerable accounts.&rdquo;
               </p>
-              <footer className="text-sm">Sofia Davis</footer>
             </blockquote>
           </div>
         </div>
@@ -145,7 +151,6 @@ function SignUp() {
 }
 
 function SignUpForm() {
-  const tdnaInstance = useTypingInstance();
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -153,6 +158,7 @@ function SignUpForm() {
       lastName: '',
       email: '',
       password: '',
+      enableBehavioralBiometrics: false,
     },
   });
   const { handleSubmit, watch } = form;
@@ -186,13 +192,9 @@ function SignUpForm() {
             events: keystrokeEventsRef.current[SIGN_UP_FORM_FIELDS.TWO_FA_5],
           }),
         ],
-        tp: tdnaInstance?.getTypingPattern({
-          type: 0,
-          text: String(values[SIGN_UP_FORM_FIELDS.PASSWORD]),
-        }),
       });
     },
-    [signUp, tdnaInstance]
+    [signUp]
   );
 
   const genernalTextFieldProps = {
@@ -241,7 +243,6 @@ function SignUpForm() {
               label="Password"
               inputProps={{
                 disabled: isPending,
-                type: 'password',
                 placeholder: 'Enter your password...',
                 onKeystokeEventsChange: (events: KeystrokeEvent[]) => {
                   keystrokeEventsRef.current[SIGN_UP_FORM_FIELDS.PASSWORD] =
@@ -254,7 +255,6 @@ function SignUpForm() {
               label="Confirm password"
               inputProps={{
                 disabled: isPending,
-                type: 'password',
                 placeholder: 'Confirm your password...',
                 onKeystokeEventsChange: (events: KeystrokeEvent[]) => {
                   keystrokeEventsRef.current[
@@ -271,20 +271,29 @@ function SignUpForm() {
                 disabled: isPending,
               }}
             />
+
             {enableBehavioralBiometrics && (
-              <>
+              <motion.div
+                initial={{
+                  height: 0,
+                }}
+                animate={{
+                  height: 'fit-content',
+                }}
+                exit={{ height: 0 }}
+              >
                 <div className="flex flex-col space-y-2 text-left">
                   <h1 className="text-xl font-semibold tracking-tight">
                     Let us know your typing pattern
                   </h1>
                   <p className="text-sm text-muted-foreground">
-                    Type the text `When the dream come true, we go to bed`. This
-                    will be use for verify you on singning in!
+                    Type the text `When the stars align, we dance all night`.
+                    This will be use for verify you on singning in!
                   </p>
                 </div>
                 <TrackedTextField
                   name={SIGN_UP_FORM_FIELDS.TWO_FA_1}
-                  label="When the dream come true, we go to bed"
+                  label={CHALLENGE_TEXT}
                   inputProps={{
                     disabled: isPending,
                     placeholder: 'Let us know your typing styles...',
@@ -296,7 +305,7 @@ function SignUpForm() {
                 />
                 <TrackedTextField
                   name={SIGN_UP_FORM_FIELDS.TWO_FA_2}
-                  label="When the dream come true, we go to bed"
+                  label={CHALLENGE_TEXT}
                   inputProps={{
                     disabled: isPending,
                     placeholder: 'Let us know your typing styles...',
@@ -308,7 +317,7 @@ function SignUpForm() {
                 />
                 <TrackedTextField
                   name={SIGN_UP_FORM_FIELDS.TWO_FA_3}
-                  label="When the dream come true, we go to bed"
+                  label={CHALLENGE_TEXT}
                   inputProps={{
                     disabled: isPending,
                     placeholder: 'Let us know your typing styles...',
@@ -320,7 +329,7 @@ function SignUpForm() {
                 />
                 <TrackedTextField
                   name={SIGN_UP_FORM_FIELDS.TWO_FA_4}
-                  label="When the dream come true, we go to bed"
+                  label={CHALLENGE_TEXT}
                   inputProps={{
                     disabled: isPending,
                     placeholder: 'Let us know your typing styles...',
@@ -332,7 +341,7 @@ function SignUpForm() {
                 />
                 <TrackedTextField
                   name={SIGN_UP_FORM_FIELDS.TWO_FA_5}
-                  label="When the dream come true, we go to bed"
+                  label={CHALLENGE_TEXT}
                   inputProps={{
                     disabled: isPending,
                     placeholder: 'Let us know your typing styles...',
@@ -342,7 +351,7 @@ function SignUpForm() {
                     },
                   }}
                 />
-              </>
+              </motion.div>
             )}
 
             <Button disabled={isPending} type="submit">
