@@ -1,15 +1,11 @@
 import { Outlet, createFileRoute, redirect } from '@tanstack/react-router';
-
-import ModeToggle from '@/components/mode-toggle';
+import { useAuth } from '@/auth';
 
 export const Route = createFileRoute('/__auth')({
   beforeLoad: ({ context, location }) => {
     if (context.auth.isAuthenticated) {
       throw redirect({
         to: '/',
-        search: {
-          redirect: location.href,
-        },
       });
     }
   },
@@ -17,5 +13,10 @@ export const Route = createFileRoute('/__auth')({
 });
 
 function AuthLayout() {
+  const { isAuthenticated } = useAuth();
+  if (isAuthenticated) {
+    throw redirect({ to: '/' });
+  }
+
   return <Outlet />;
 }

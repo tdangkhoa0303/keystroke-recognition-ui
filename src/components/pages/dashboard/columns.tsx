@@ -2,7 +2,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { createColumnHelper } from '@tanstack/react-table';
 
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Badge } from '@/components/ui/badge';
+import { Badge, BadgeProps } from '@/components/ui/badge';
 import DataTable from '@/components/ui/data-table';
 import {
   Tooltip,
@@ -12,9 +12,24 @@ import {
 } from '@/components/ui/tooltip';
 import { cn, getNameAvatar } from '@/lib/utils';
 import { format } from 'date-fns';
-import { BanIcon, CheckCircle, ChevronDown } from 'lucide-react';
+import { ChevronDown } from 'lucide-react';
 import { DataTableRowActions } from './data-table-row-actions';
-import { SessionData } from './types';
+import { SessionData, SessionStatus } from './types';
+
+const BADGE_VARIANTS_BY_STATUSES: Record<SessionStatus, BadgeProps['variant']> =
+  {
+    [SessionStatus.ACTIVE]: 'default',
+    [SessionStatus.REVOKED]: 'destructive',
+    [SessionStatus.EXPIRED]: 'secondary',
+    [SessionStatus.PENDING]: 'outline',
+  };
+
+const STATUS_TEXTS: Record<SessionStatus, string> = {
+  [SessionStatus.ACTIVE]: 'Activated',
+  [SessionStatus.REVOKED]: 'Revoked',
+  [SessionStatus.EXPIRED]: 'Expired',
+  [SessionStatus.PENDING]: 'Pending',
+};
 
 const columnHelper = createColumnHelper<SessionData>();
 
@@ -120,7 +135,7 @@ export const columns = [
     header: ({ column }) => (
       <DataTable.Header column={column} title="Success Rate" />
     ),
-    cell: ({ getValue, row }) => {
+    cell: ({ getValue }) => {
       const [{ total_legitimate, total_samples }] = getValue();
 
       return (
@@ -138,17 +153,18 @@ export const columns = [
     enableSorting: false,
     enableHiding: false,
   }),
-  columnHelper.accessor('is_revoked', {
+  columnHelper.accessor('status', {
     header: ({ column }) => (
-      <DataTable.Header column={column} title="Validity" className="min-w-20" />
+      <DataTable.Header column={column} title="Status" className="min-w-20" />
     ),
-    cell: ({ getValue }) => {
-      return getValue() ? (
-        <BanIcon className="text-red-500" />
-      ) : (
-        <CheckCircle className="text-green-500" />
-      );
-    },
+    cell: ({ getValue }) => (
+      <Badge
+        className="uppercase"
+        variant={BADGE_VARIANTS_BY_STATUSES[getValue()]}
+      >
+        {STATUS_TEXTS[getValue()]}
+      </Badge>
+    ),
     enableSorting: false,
     enableHiding: false,
   }),

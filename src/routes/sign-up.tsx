@@ -243,7 +243,6 @@ function SignUpForm() {
               label="Password"
               inputProps={{
                 disabled: isPending,
-                type: 'password',
                 placeholder: 'Enter your password...',
                 onKeystokeEventsChange: (events: KeystrokeEvent[]) => {
                   keystrokeEventsRef.current[SIGN_UP_FORM_FIELDS.PASSWORD] =
@@ -256,7 +255,6 @@ function SignUpForm() {
               label="Confirm password"
               inputProps={{
                 disabled: isPending,
-                type: 'password',
                 placeholder: 'Confirm your password...',
                 onKeystokeEventsChange: (events: KeystrokeEvent[]) => {
                   keystrokeEventsRef.current[

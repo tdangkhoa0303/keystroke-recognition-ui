@@ -2,7 +2,6 @@ import { TrackedTextField } from '@/components/form';
 import { TrackerControllers } from '@/components/form/tracked-text-field';
 import { Button } from '@/components/ui/button';
 import {
-  Card,
   CardContent,
   CardDescription,
   CardFooter,
@@ -28,7 +27,8 @@ const VERIFICATION_FORM_FIELDS = {
 const VerificationFormSchema = z.object({
   [VERIFICATION_FORM_FIELDS.SAMPLES]: z
     .string()
-    .length(CHALLENGE_TEXT.length, 'Please try to type the text correctly.'),
+    .min(CHALLENGE_TEXT.length - 3, 'Please try to type the text correctly.')
+    .max(CHALLENGE_TEXT.length + 3, 'Please try to type the text correctly.'),
 });
 
 export type VerificationForData = z.infer<typeof VerificationFormSchema>;
@@ -60,13 +60,15 @@ const VerificationForm = ({
     <Form {...form}>
       <form
         autoComplete="off"
-        onSubmit={handleSubmit(() =>
+        onSubmit={handleSubmit(() => {
           onSubmit({
             samples: generateKeystrokeSamples({
               events: keystrokeEventsRef.current,
             }),
-          })
-        )}
+          });
+
+          trackerRef.current?.reset();
+        })}
       >
         <FormContainer>
           <CardHeader className="space-y-1">

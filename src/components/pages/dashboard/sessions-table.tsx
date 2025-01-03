@@ -8,7 +8,6 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { Icons } from '@/components/ui/icons';
-import Spinner from '@/components/ui/spinner';
 import { TableCell, TableHead, TableRow } from '@/components/ui/table';
 import {
   DASHBOARD_QUERY_KEY_PREFIX,
@@ -19,7 +18,7 @@ import apiClient from '@/lib/api-client';
 import { Sample } from '@/models/sample';
 import { SecurityLevel } from '@/models/user';
 import { PaginatedResponse } from '@/types';
-import { keepPreviousData, useQuery } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import {
   ColumnFiltersState,
   ExpandedState,
@@ -34,9 +33,9 @@ import {
 import { format } from 'date-fns';
 import { ChevronDown, ChevronsUpDown, ChevronUp } from 'lucide-react';
 import { useState } from 'react';
+import { DateRange } from 'react-day-picker';
 import { columns } from './columns';
 import { SessionData } from './types';
-import { DateRange } from 'react-day-picker';
 
 const DEFAULT_DATA: SessionData[] = [];
 
@@ -80,6 +79,7 @@ const SAMPLE_COLUMNS = [
 const ExpandingRow = ({ data }: { data: SessionData }) => {
   const { data: samplesData, isFetched: isFetchedSamples } = useQuery({
     queryKey: [DASHBOARD_QUERY_KEY_PREFIX, SESSIONS_QUERY_KEY, data.id],
+    refetchOnMount: true,
     queryFn: () =>
       apiClient
         .get<PaginatedResponse<Sample & { id: string }>>('/api/samples/', {
@@ -141,6 +141,7 @@ const SessionsTable = ({ dateRange }: { dateRange: DateRange }) => {
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const { data: sessionsData, isFetching } = useQuery({
+    refetchOnMount: true,
     queryKey: [
       DASHBOARD_QUERY_KEY_PREFIX,
       SESSIONS_QUERY_KEY,
@@ -158,7 +159,6 @@ const SessionsTable = ({ dateRange }: { dateRange: DateRange }) => {
           },
         })
         .then((res) => res.data),
-    placeholderData: keepPreviousData,
   });
 
   const { items: sessions = DEFAULT_DATA, total_items: totalItems = 0 } =

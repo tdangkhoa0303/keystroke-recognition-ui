@@ -1,7 +1,6 @@
 import TextField from '@/components/form/text-field';
 import { Button, buttonVariants } from '@/components/ui/button';
 import {
-  Card,
   CardContent,
   CardDescription,
   CardFooter,
@@ -10,12 +9,12 @@ import {
 } from '@/components/ui/card';
 import { Form } from '@/components/ui/form';
 import { Icons } from '@/components/ui/icons';
+import { cn } from '@/lib/utils';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { Link } from '@tanstack/react-router';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import FormContainer from './form-container';
-import { Link, useNavigate } from '@tanstack/react-router';
-import { cn } from '@/lib/utils';
 
 const SIGN_IN_FORM_FIELDS = {
   EMAIL: 'email',
@@ -44,7 +43,6 @@ const SignInForm = ({ loading, onSubmit }: SignInFormProps) => {
   });
 
   const { handleSubmit } = form;
-  const navigate = useNavigate();
 
   return (
     <Form {...form}>

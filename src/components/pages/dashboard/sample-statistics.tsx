@@ -1,5 +1,4 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import Spinner from '@/components/ui/spinner';
 import {
   DASHBOARD_QUERY_KEY_PREFIX,
   SAMPLE_STATISTICS_QUERY_KEY,
@@ -18,6 +17,7 @@ const SampleStatistics = ({ dateRange }: { dateRange: DateRange }) => {
         SAMPLE_STATISTICS_QUERY_KEY,
         dateRange,
       ],
+      refetchOnMount: true,
       queryFn: () =>
         apiClient
           .get<{ totalSamples: number; totalSuccess: number }>(

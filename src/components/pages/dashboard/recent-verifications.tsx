@@ -172,7 +172,6 @@ const RecentVerifications = ({ dateRange }: { dateRange: DateRange }) => {
           },
         })
         .then((res) => res.data),
-    placeholderData: keepPreviousData,
   });
 
   const { items: samples = [], total_items: totalItems = 0 } =

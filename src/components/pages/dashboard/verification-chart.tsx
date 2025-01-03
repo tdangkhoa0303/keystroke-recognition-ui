@@ -48,6 +48,8 @@ function VerificationChart({ dateRange }: { dateRange: DateRange }) {
         VERIFICATION_STATISTICS_QUERY_KEY,
         dateRange,
       ],
+
+      refetchOnMount: true,
       queryFn: () =>
         apiClient
           .get<Array<{ date: string; imposter: number; legitimate: number }>>(
@@ -61,8 +63,6 @@ function VerificationChart({ dateRange }: { dateRange: DateRange }) {
           )
           .then((res) => res.data),
     });
-
-  console.log(statisticsData);
 
   return (
     <Card>
