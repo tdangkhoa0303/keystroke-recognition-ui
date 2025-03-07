@@ -28,6 +28,7 @@ import {
   ResponsiveContainer,
   XAxis,
 } from 'recharts';
+import { DEFAULT_REFETCH_INTERVAL } from './constants';
 
 const chartConfig = {
   imposter: {
@@ -41,28 +42,27 @@ const chartConfig = {
 } satisfies ChartConfig;
 
 function VerificationChart({ dateRange }: { dateRange: DateRange }) {
-  const { data: statisticsData = [], isFetching: isFetchingSampleStatistics } =
-    useQuery({
-      queryKey: [
-        DASHBOARD_QUERY_KEY_PREFIX,
-        VERIFICATION_STATISTICS_QUERY_KEY,
-        dateRange,
-      ],
-
-      refetchOnMount: true,
-      queryFn: () =>
-        apiClient
-          .get<Array<{ date: string; imposter: number; legitimate: number }>>(
-            '/api/statistics/verifications',
-            {
-              params: {
-                start_date: dateRange.from,
-                end_date: dateRange.to,
-              },
-            }
-          )
-          .then((res) => res.data),
-    });
+  const { data: statisticsData = [], isFetched } = useQuery({
+    queryKey: [
+      DASHBOARD_QUERY_KEY_PREFIX,
+      VERIFICATION_STATISTICS_QUERY_KEY,
+      dateRange,
+    ],
+    refetchOnMount: true,
+    refetchInterval: DEFAULT_REFETCH_INTERVAL,
+    queryFn: () =>
+      apiClient
+        .get<Array<{ date: string; imposter: number; legitimate: number }>>(
+          '/api/statistics/verifications',
+          {
+            params: {
+              start_date: dateRange.from,
+              end_date: dateRange.to,
+            },
+          }
+        )
+        .then((res) => res.data),
+  });
 
   return (
     <Card>
@@ -73,7 +73,7 @@ function VerificationChart({ dateRange }: { dateRange: DateRange }) {
         </CardDescription>
       </CardHeader>
       <CardContent className="pl-2">
-        <Spinner loading={isFetchingSampleStatistics}>
+        <Spinner loading={!isFetched}>
           <ResponsiveContainer width="100%" height={350}>
             <ChartContainer config={chartConfig}>
               <BarChart accessibilityLayer data={statisticsData}>

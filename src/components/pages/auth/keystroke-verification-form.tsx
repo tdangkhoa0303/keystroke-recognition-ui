@@ -15,7 +15,7 @@ import { generateKeystrokeSamples } from '@/lib/tracker';
 import { KeystrokeEvent, Sample } from '@/models/sample';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { ArrowRight } from 'lucide-react';
-import { useRef } from 'react';
+import { forwardRef, useImperativeHandle, useRef } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import FormContainer from './form-container';
@@ -39,11 +39,10 @@ interface VerificationFormProps {
   onSubmit: (data: { samples: Sample[] }) => void;
 }
 
-const VerificationForm = ({
-  loading,
-  onSubmit,
-  onSignInWithAnotherAccount,
-}: VerificationFormProps) => {
+const VerificationForm = forwardRef<
+  { reset: () => void },
+  VerificationFormProps
+>(({ loading, onSubmit, onSignInWithAnotherAccount }, ref) => {
   const form = useForm<VerificationForData>({
     defaultValues: {
       samples: '',
@@ -51,10 +50,18 @@ const VerificationForm = ({
     resolver: zodResolver(VerificationFormSchema),
   });
 
-  const { handleSubmit } = form;
+  const { handleSubmit, reset } = form;
 
   const trackerRef = useRef<TrackerControllers>(null);
   const keystrokeEventsRef = useRef<KeystrokeEvent[]>([]);
+
+  useImperativeHandle(
+    ref,
+    () => ({
+      reset,
+    }),
+    [reset]
+  );
 
   return (
     <Form {...form}>
@@ -114,6 +121,6 @@ const VerificationForm = ({
       </form>
     </Form>
   );
-};
+});
 
 export default VerificationForm;

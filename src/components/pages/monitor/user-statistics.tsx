@@ -1,6 +1,4 @@
-import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import Spinner from '@/components/ui/spinner';
 import {
   DASHBOARD_QUERY_KEY_PREFIX,
   USER_STATISTICS_QUERY_KEY,
@@ -10,28 +8,30 @@ import { useQuery } from '@tanstack/react-query';
 import { User2 } from 'lucide-react';
 import { DateRange } from 'react-day-picker';
 import StatisticSkeleton from './statistic-skeleton';
+import { DEFAULT_REFETCH_INTERVAL } from './constants';
 
 const UserStatistics = ({ dateRange }: { dateRange: DateRange }) => {
-  const { data: statisticsData, isFetching: isFetchingUserStatistics } =
-    useQuery({
-      queryKey: [
-        DASHBOARD_QUERY_KEY_PREFIX,
-        USER_STATISTICS_QUERY_KEY,
-        dateRange,
-      ],
-      queryFn: () =>
-        apiClient
-          .get<{ enabledUsers: number; totalUsers: number }>(
-            '/api/statistics/users',
-            {
-              params: {
-                start_date: dateRange.from,
-                end_date: dateRange.to,
-              },
-            }
-          )
-          .then((res) => res.data),
-    });
+  const { data: statisticsData, isFetched } = useQuery({
+    queryKey: [
+      DASHBOARD_QUERY_KEY_PREFIX,
+      USER_STATISTICS_QUERY_KEY,
+      dateRange,
+    ],
+    refetchOnMount: true,
+    refetchInterval: DEFAULT_REFETCH_INTERVAL,
+    queryFn: () =>
+      apiClient
+        .get<{ enabledUsers: number; totalUsers: number }>(
+          '/api/statistics/users',
+          {
+            params: {
+              start_date: dateRange.from,
+              end_date: dateRange.to,
+            },
+          }
+        )
+        .then((res) => res.data),
+  });
 
   const { enabledUsers, totalUsers } = statisticsData ?? {};
 
@@ -45,11 +45,7 @@ const UserStatistics = ({ dateRange }: { dateRange: DateRange }) => {
       </CardHeader>
       <CardContent>
         <div className="text-2xl font-bold h-8 flex items-center">
-          {isFetchingUserStatistics ? (
-            <StatisticSkeleton />
-          ) : (
-            `${enabledUsers}/${totalUsers}`
-          )}
+          {!isFetched ? <StatisticSkeleton /> : `${enabledUsers}/${totalUsers}`}
         </div>
       </CardContent>
     </Card>

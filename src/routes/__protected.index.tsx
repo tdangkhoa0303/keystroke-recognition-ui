@@ -1,32 +1,32 @@
-import { createFileRoute } from '@tanstack/react-router'
-import { faker } from '@faker-js/faker'
+import { createFileRoute } from '@tanstack/react-router';
+import { faker } from '@faker-js/faker';
 import {
   Card,
   CardContent,
   CardFooter,
   CardHeader,
   CardTitle,
-} from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
-import { useMemo, useState } from 'react'
-import { Skeleton } from '@/components/ui/skeleton'
+} from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { useMemo, useState } from 'react';
+import { Skeleton } from '@/components/ui/skeleton';
 
 export const Route = createFileRoute('/__protected/')({
   component: () => <Index />,
-})
+});
 
 export type Product = {
-  id: string
-  name: string
-  description: string
-  price: number
-  category: string
-  image: string
-  stock: number
-}
+  id: string;
+  name: string;
+  description: string;
+  price: number;
+  category: string;
+  image: string;
+  stock: number;
+};
 
 function ProductCard({ product }: { product: Product }) {
-  const [isImageLoaded, setIsImageLoaded] = useState(false)
+  const [isImageLoaded, setIsImageLoaded] = useState(false);
 
   return (
     <Card className="max-w-sm shadow-md light:border-none">
@@ -64,7 +64,7 @@ function ProductCard({ product }: { product: Product }) {
         <Button disabled={product.stock === 0}>Add to Cart</Button>
       </CardFooter>
     </Card>
-  )
+  );
 }
 
 const generateShopData = (count = 10): Product[] =>
@@ -77,20 +77,20 @@ const generateShopData = (count = 10): Product[] =>
         min: 10,
         max: 500,
         dec: 2,
-      }),
+      })
     ), // Prices between $10 and $500
     category: faker.commerce.department(),
     image: faker.image.urlPicsumPhotos({
-      width: 1024,
-      height: 1024,
+      width: 512,
+      height: 512 * 0.75,
       blur: 0,
       grayscale: false,
     }), // Random placeholder images
     stock: faker.number.int({ min: 0, max: 100 }), // Random stock count
-  }))
+  }));
 
 function Index() {
-  const products = useMemo(() => generateShopData(10), [])
+  const products = useMemo(() => generateShopData(10), []);
 
   return (
     <div className="space-y-4 max-w-screen-2xl mx-auto">
@@ -101,5 +101,5 @@ function Index() {
         ))}
       </div>
     </div>
-  )
+  );
 }

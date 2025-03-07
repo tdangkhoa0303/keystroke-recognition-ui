@@ -287,8 +287,8 @@ function SignUpForm() {
                     Let us know your typing pattern
                   </h1>
                   <p className="text-sm text-muted-foreground">
-                    Type the text `When the stars align, we dance all night`.
-                    This will be use for verify you on singning in!
+                    Type the text `{CHALLENGE_TEXT}`. This will be use for
+                    verify you on singning in!
                   </p>
                 </div>
                 <TrackedTextField

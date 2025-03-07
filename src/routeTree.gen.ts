@@ -16,7 +16,7 @@ import { Route as protectedImport } from './routes/__protected'
 import { Route as authImport } from './routes/__auth'
 import { Route as protectedIndexImport } from './routes/__protected.index'
 import { Route as protectedSettingsImport } from './routes/__protected.settings'
-import { Route as protectedDashboardImport } from './routes/__protected.dashboard'
+import { Route as protectedMonitorImport } from './routes/__protected.monitor'
 import { Route as authSignInImport } from './routes/__auth.sign-in'
 
 // Create/Update Routes
@@ -49,9 +49,9 @@ const protectedSettingsRoute = protectedSettingsImport.update({
   getParentRoute: () => protectedRoute,
 } as any)
 
-const protectedDashboardRoute = protectedDashboardImport.update({
-  id: '/dashboard',
-  path: '/dashboard',
+const protectedMonitorRoute = protectedMonitorImport.update({
+  id: '/monitor',
+  path: '/monitor',
   getParentRoute: () => protectedRoute,
 } as any)
 
@@ -93,11 +93,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof authSignInImport
       parentRoute: typeof authImport
     }
-    '/__protected/dashboard': {
-      id: '/__protected/dashboard'
-      path: '/dashboard'
-      fullPath: '/dashboard'
-      preLoaderRoute: typeof protectedDashboardImport
+    '/__protected/monitor': {
+      id: '/__protected/monitor'
+      path: '/monitor'
+      fullPath: '/monitor'
+      preLoaderRoute: typeof protectedMonitorImport
       parentRoute: typeof protectedImport
     }
     '/__protected/settings': {
@@ -130,13 +130,13 @@ const authRouteChildren: authRouteChildren = {
 const authRouteWithChildren = authRoute._addFileChildren(authRouteChildren)
 
 interface protectedRouteChildren {
-  protectedDashboardRoute: typeof protectedDashboardRoute
+  protectedMonitorRoute: typeof protectedMonitorRoute
   protectedSettingsRoute: typeof protectedSettingsRoute
   protectedIndexRoute: typeof protectedIndexRoute
 }
 
 const protectedRouteChildren: protectedRouteChildren = {
-  protectedDashboardRoute: protectedDashboardRoute,
+  protectedMonitorRoute: protectedMonitorRoute,
   protectedSettingsRoute: protectedSettingsRoute,
   protectedIndexRoute: protectedIndexRoute,
 }
@@ -149,7 +149,7 @@ export interface FileRoutesByFullPath {
   '': typeof protectedRouteWithChildren
   '/sign-up': typeof SignUpRoute
   '/sign-in': typeof authSignInRoute
-  '/dashboard': typeof protectedDashboardRoute
+  '/monitor': typeof protectedMonitorRoute
   '/settings': typeof protectedSettingsRoute
   '/': typeof protectedIndexRoute
 }
@@ -158,7 +158,7 @@ export interface FileRoutesByTo {
   '': typeof authRouteWithChildren
   '/sign-up': typeof SignUpRoute
   '/sign-in': typeof authSignInRoute
-  '/dashboard': typeof protectedDashboardRoute
+  '/monitor': typeof protectedMonitorRoute
   '/settings': typeof protectedSettingsRoute
   '/': typeof protectedIndexRoute
 }
@@ -169,23 +169,23 @@ export interface FileRoutesById {
   '/__protected': typeof protectedRouteWithChildren
   '/sign-up': typeof SignUpRoute
   '/__auth/sign-in': typeof authSignInRoute
-  '/__protected/dashboard': typeof protectedDashboardRoute
+  '/__protected/monitor': typeof protectedMonitorRoute
   '/__protected/settings': typeof protectedSettingsRoute
   '/__protected/': typeof protectedIndexRoute
 }
 
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '' | '/sign-up' | '/sign-in' | '/dashboard' | '/settings' | '/'
+  fullPaths: '' | '/sign-up' | '/sign-in' | '/monitor' | '/settings' | '/'
   fileRoutesByTo: FileRoutesByTo
-  to: '' | '/sign-up' | '/sign-in' | '/dashboard' | '/settings' | '/'
+  to: '' | '/sign-up' | '/sign-in' | '/monitor' | '/settings' | '/'
   id:
     | '__root__'
     | '/__auth'
     | '/__protected'
     | '/sign-up'
     | '/__auth/sign-in'
-    | '/__protected/dashboard'
+    | '/__protected/monitor'
     | '/__protected/settings'
     | '/__protected/'
   fileRoutesById: FileRoutesById
@@ -229,7 +229,7 @@ export const routeTree = rootRoute
     "/__protected": {
       "filePath": "__protected.tsx",
       "children": [
-        "/__protected/dashboard",
+        "/__protected/monitor",
         "/__protected/settings",
         "/__protected/"
       ]
@@ -241,8 +241,8 @@ export const routeTree = rootRoute
       "filePath": "__auth.sign-in.tsx",
       "parent": "/__auth"
     },
-    "/__protected/dashboard": {
-      "filePath": "__protected.dashboard.tsx",
+    "/__protected/monitor": {
+      "filePath": "__protected.monitor.tsx",
       "parent": "/__protected"
     },
     "/__protected/settings": {

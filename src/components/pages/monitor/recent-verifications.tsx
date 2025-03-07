@@ -42,6 +42,7 @@ import { useState } from 'react';
 import { DateRange } from 'react-day-picker';
 import Spinner from '@/components/ui/spinner';
 import { getNameAvatar } from '@/lib/utils';
+import { DEFAULT_REFETCH_INTERVAL } from './constants';
 
 const SECURITY_LEVEL_ICONS = {
   [SecurityLevel.LOW]: ChevronDown,
@@ -154,7 +155,9 @@ const RecentVerifications = ({ dateRange }: { dateRange: DateRange }) => {
 
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
-  const { data: samplesData, isFetching: isFetchingSamples } = useQuery({
+  const { data: samplesData, isFetched } = useQuery({
+    refetchOnMount: true,
+    refetchInterval: DEFAULT_REFETCH_INTERVAL,
     queryKey: [
       DASHBOARD_QUERY_KEY_PREFIX,
       SAMPLES_QUERY_KEY,
@@ -209,7 +212,7 @@ const RecentVerifications = ({ dateRange }: { dateRange: DateRange }) => {
           table={table}
           columns={columns}
           pageSizeOptions={[6, 12, 24]}
-          loading={isFetchingSamples}
+          loading={!isFetched}
         />
       </CardContent>
     </Card>

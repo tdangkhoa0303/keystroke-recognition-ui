@@ -4,6 +4,11 @@ export enum SecurityLevel {
   HIGH = 'HIGH',
 }
 
+export enum UserRole {
+  ADMIN = 'admin',
+  MEMBER = 'member',
+}
+
 export interface User {
   id: string;
   firstName: string;
@@ -12,4 +17,5 @@ export interface User {
   createdAt: string;
   enableBehaviouralBiometrics: boolean;
   securityLevel: SecurityLevel;
+  role: UserRole;
 }

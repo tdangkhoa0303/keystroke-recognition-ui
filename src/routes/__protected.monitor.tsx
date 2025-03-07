@@ -1,20 +1,20 @@
 import { createFileRoute } from '@tanstack/react-router';
 
 import { CalendarDateRangePicker } from '@/components/dashboard/date-range-picker';
-import RecentVerifications from '@/components/pages/dashboard/recent-verifications';
-import SampleStatistics from '@/components/pages/dashboard/sample-statistics';
-import SessionsTable from '@/components/pages/dashboard/sessions-table';
-import UserStatistics from '@/components/pages/dashboard/user-statistics';
-import VerificationChart from '@/components/pages/dashboard/verification-chart';
+import RecentVerifications from '@/components/pages/monitor/recent-verifications';
+import SampleStatistics from '@/components/pages/monitor/sample-statistics';
+import SessionsTable from '@/components/pages/monitor/sessions-table';
+import UserStatistics from '@/components/pages/monitor/user-statistics';
+import VerificationChart from '@/components/pages/monitor/verification-chart';
 import { Button } from '@/components/ui/button';
 import { DASHBOARD_QUERY_KEY_PREFIX } from '@/constants/query-keys';
 import { useQueryClient } from '@tanstack/react-query';
+import { subMonths } from 'date-fns';
 import { RefreshCwIcon } from 'lucide-react';
-import { DateRange } from 'react-day-picker';
 import { useState } from 'react';
-import { subDays } from 'date-fns';
+import { DateRange } from 'react-day-picker';
 
-export const Route = createFileRoute('/__protected/dashboard')({
+export const Route = createFileRoute('/__protected/monitor')({
   component: () => <Dashboard />,
 });
 
@@ -23,14 +23,14 @@ const TODAY = new Date();
 function Dashboard() {
   const queryClient = useQueryClient();
   const [dateRange, setDateRange] = useState<DateRange>({
-    from: subDays(TODAY, 14),
+    from: subMonths(TODAY, 4),
     to: TODAY,
   });
 
   return (
     <>
       <div className="flex items-center justify-between space-y-2">
-        <h2 className="text-3xl font-bold tracking-tight">Dashboard</h2>
+        <h2 className="text-3xl font-bold tracking-tight">Monitor</h2>
         <div className="flex items-center space-x-2">
           <CalendarDateRangePicker
             value={dateRange}

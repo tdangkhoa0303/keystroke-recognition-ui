@@ -53,17 +53,16 @@ function ProtectedLayout() {
       </div>
       <div className="hidden flex-col md:flex">
         <div className="border-b">
-          <div className="flex h-16 items-center px-4">
+          <div className="flex h-16 items-center px-4 max-w-screen-2xl m-auto">
             <Logo className="w-9 h-9" />
             <MainNav className="mx-6" />
             <div className="ml-auto flex items-center space-x-4">
-              <Search />
               <UserNav />
               <ModeToggle />
             </div>
           </div>
         </div>
-        <div className="flex-1 space-y-4 p-4 pt-6">
+        <div className="flex-1 space-y-4 p-4 pt-6 max-w-screen-2xl m-auto w-full">
           <Outlet />
         </div>
       </div>

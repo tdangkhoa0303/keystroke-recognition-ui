@@ -4,7 +4,6 @@ import {
   Outlet,
   ScrollRestoration,
 } from '@tanstack/react-router';
-import { TanStackRouterDevtools } from '@tanstack/router-devtools';
 
 import type { AuthContextValue } from '../auth';
 
@@ -22,7 +21,6 @@ function Root() {
       <Outlet />
       <Toaster />
       <ScrollRestoration />
-      {/* <TanStackRouterDevtools /> */}
     </>
   );
 }

@@ -6,6 +6,7 @@ import { useCustomMutation } from '@/hooks/api';
 import apiClient from '@/lib/api-client';
 import { createFileRoute, redirect, useNavigate } from '@tanstack/react-router';
 import { AnimatePresence, motion } from 'framer-motion';
+import { useRef } from 'react';
 import { z } from 'zod';
 
 const fallback = '/' as const;
@@ -25,6 +26,7 @@ export const Route = createFileRoute('/__auth/sign-in')({
 function SignIn() {
   const { login, logout, sessionData } = useAuth();
   const navigate = useNavigate();
+  const verificationFormRef = useRef<{ reset: () => void } | null>(null);
 
   const { mutate: signIn, isPending: isSigningIn } = useCustomMutation({
     mutationFn: (data: Record<string, unknown>) =>
@@ -78,6 +80,9 @@ function SignIn() {
           navigate({ to: '/' });
         }
       },
+      onSettled: () => {
+        verificationFormRef.current?.reset();
+      },
     });
 
   const shouldShowVerificationForm = sessionData?.pending;
@@ -117,6 +122,7 @@ function SignIn() {
               >
                 {shouldShowVerificationForm ? (
                   <VerificationForm
+                    ref={verificationFormRef}
                     onSubmit={verifyKeystroke}
                     loading={isVerifyingKeystroke}
                     onSignInWithAnotherAccount={logout}

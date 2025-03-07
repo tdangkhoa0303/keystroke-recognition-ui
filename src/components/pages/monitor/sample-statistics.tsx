@@ -8,29 +8,30 @@ import { useQuery } from '@tanstack/react-query';
 import { LineChartIcon } from 'lucide-react';
 import { DateRange } from 'react-day-picker';
 import StatisticSkeleton from './statistic-skeleton';
+import { DEFAULT_REFETCH_INTERVAL } from './constants';
 
 const SampleStatistics = ({ dateRange }: { dateRange: DateRange }) => {
-  const { data: statisticsData, isFetching: isFetchingSampleStatistics } =
-    useQuery({
-      queryKey: [
-        DASHBOARD_QUERY_KEY_PREFIX,
-        SAMPLE_STATISTICS_QUERY_KEY,
-        dateRange,
-      ],
-      refetchOnMount: true,
-      queryFn: () =>
-        apiClient
-          .get<{ totalSamples: number; totalSuccess: number }>(
-            '/api/statistics/samples',
-            {
-              params: {
-                start_date: dateRange.from,
-                end_date: dateRange.to,
-              },
-            }
-          )
-          .then((res) => res.data),
-    });
+  const { data: statisticsData, isFetched } = useQuery({
+    queryKey: [
+      DASHBOARD_QUERY_KEY_PREFIX,
+      SAMPLE_STATISTICS_QUERY_KEY,
+      dateRange,
+    ],
+    refetchOnMount: true,
+    refetchInterval: DEFAULT_REFETCH_INTERVAL,
+    queryFn: () =>
+      apiClient
+        .get<{ totalSamples: number; totalSuccess: number }>(
+          '/api/statistics/samples',
+          {
+            params: {
+              start_date: dateRange.from,
+              end_date: dateRange.to,
+            },
+          }
+        )
+        .then((res) => res.data),
+  });
 
   const { totalSamples = 0, totalSuccess = 0 } = statisticsData ?? {};
 
@@ -44,7 +45,7 @@ const SampleStatistics = ({ dateRange }: { dateRange: DateRange }) => {
       </CardHeader>
       <CardContent>
         <div className="text-2xl font-bold">
-          {isFetchingSampleStatistics ? (
+          {!isFetched ? (
             <StatisticSkeleton />
           ) : (
             `${(((totalSamples - totalSuccess) / totalSamples) * 100).toFixed(

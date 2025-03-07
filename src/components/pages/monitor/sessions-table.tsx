@@ -31,11 +31,19 @@ import {
   VisibilityState,
 } from '@tanstack/react-table';
 import { format } from 'date-fns';
-import { ChevronDown, ChevronsUpDown, ChevronUp } from 'lucide-react';
+import {
+  ChevronDown,
+  ChevronsUpDown,
+  ChevronUp,
+  RefreshCwIcon,
+} from 'lucide-react';
 import { useState } from 'react';
 import { DateRange } from 'react-day-picker';
 import { columns } from './columns';
 import { SessionData } from './types';
+import { Button } from '@/components/ui/button';
+import clsx from 'clsx';
+import { DEFAULT_REFETCH_INTERVAL } from './constants';
 
 const DEFAULT_DATA: SessionData[] = [];
 
@@ -140,8 +148,14 @@ const SessionsTable = ({ dateRange }: { dateRange: DateRange }) => {
   const [rowSelection, setRowSelection] = useState({});
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
-  const { data: sessionsData, isFetching } = useQuery({
+  const {
+    data: sessionsData,
+    isFetched,
+    isFetching,
+    refetch,
+  } = useQuery({
     refetchOnMount: true,
+    refetchInterval: DEFAULT_REFETCH_INTERVAL,
     queryKey: [
       DASHBOARD_QUERY_KEY_PREFIX,
       SESSIONS_QUERY_KEY,
@@ -192,14 +206,22 @@ const SessionsTable = ({ dateRange }: { dateRange: DateRange }) => {
   return (
     <Card className="overflow-hidden">
       <CardHeader>
-        <CardTitle>Recent Sessions</CardTitle>
-        <CardDescription></CardDescription>
+        <CardTitle className="flex items-center justify-between">
+          <span>Recent Sessions</span>
+          <Button onClick={() => refetch()} disabled={isFetching}>
+            <RefreshCwIcon
+              className={clsx({
+                'animate-spin': isFetching,
+              })}
+            />
+          </Button>
+        </CardTitle>
       </CardHeader>
       <CardContent>
         <DataTable<SessionData>
           table={table}
           columns={columns}
-          loading={isFetching}
+          loading={!isFetched}
           ExpandingRowComponent={ExpandingRow}
         />
       </CardContent>
